@@ -32,9 +32,9 @@ check_docker_installation:
 .PHONY: download_docker_internal
 download_docker_internal:
 	@OS="$$(uname -s)"; \
-	echo "aaaaaaaaaa";
-	echo "$$OS";
-	echo $$OS;
+	echo "aaaaaaaaaa"; \
+	echo "$$OS"; \
+	echo $$OS; \
 	if [ "$$OS" = "Darwin" ]; then \
 		echo "Installing Docker for macOS..."; \
 		curl -fsSL https://get.docker.com -o get-docker.sh; \
@@ -50,7 +50,7 @@ download_docker_internal:
 		echo "Docker installation completed."; \
 		echo "Please log out and log back in to use Docker without sudo."; \
 	elif [ "$$(OS)" = "FreeBSD" ]; then \
-		# Installing Docker on FreeBSD
+		# Installing Docker on FreeBSD \
 		echo "Installing Docker for FreeBSD..."; \
 #		pkg install -y docker; \
 #		echo 'docker_enable="YES"' >> /etc/rc.conf; \
