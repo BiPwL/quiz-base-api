@@ -22,35 +22,33 @@ check_docker_installation:
 	fi; \
 	if ! command -v "$$DOCKER_COMMAND" >/dev/null; then \
 		echo "Docker is not installed. Installing Docker..."; \
-		$(MAKE) install_docker; \
+		$(MAKE) download_docker; \
 	else \
 		echo "Docker is already installed."; \
 	fi
 
 .PHONY: download_docker
-download_docker:
-	OS := $(shell uname -s)
-	ifeq ($(OS),Darwin)
-		# Installing Docker on macOS
-		@echo "Installing Docker for macOS..."
-		@curl -fsSL https://get.docker.com -o get-docker.sh
-		@sh get-docker.sh
-		@rm get-docker.sh
-	endif
-	ifeq ($(OS),Linux)
-		# Installing Docker on Linux
-		@echo "Installing Docker for Linux..."
-		@curl -fsSL https://get.docker.com -o get-docker.sh
-		@sudo sh get-docker.sh
-		@sudo usermod -aG docker $(USER)
-		@rm get-docker.sh
-		@echo "Please log out and log back in to use Docker without sudo."
-	endif
-	ifeq ($(OS),Windows_NT)
-		# Installing Docker on Windows
-		@echo "Please download Docker Desktop for Windows from the official website and follow the installation instructions:"
-		@echo "https://www.docker.com/products/docker-desktop"
-	endif
+download_docker: check_docker_installation
+	@OS=$$(uname -s); \
+	if [ "$$OS" = "Darwin" ]; then \
+		echo "Installing Docker for macOS..."; \
+		curl -fsSL https://get.docker.com -o get-docker.sh; \
+		sh get-docker.sh; \
+		rm get-docker.sh; \
+		echo "Docker installation completed."; \
+	elif [ "$$OS" = "Linux" ]; then \
+		echo "Installing Docker for Linux..."; \
+		curl -fsSL https://get.docker.com -o get-docker.sh; \
+		sudo sh get-docker.sh; \
+		sudo usermod -aG docker $$(id -un); \
+		rm get-docker.sh; \
+		echo "Docker installation completed."; \
+		echo "Please log out and log back in to use Docker without sudo."; \
+	else \
+		echo "Please download Docker Desktop for Windows from the official website and follow the installation instructions:"; \
+		echo "https://www.docker.com/products/docker-desktop"; \
+	fi
+
 
 .PHONY: download_psql_image
 download_psql_image:
