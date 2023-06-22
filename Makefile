@@ -45,7 +45,7 @@ download_docker_internal:
 		sudo usermod -aG docker $$(whoami); \
 		rm get-docker.sh; \
 		echo "Please log out and log back in to use Docker without sudo."; \
-	elif [ "$(OS)" = "FreeBSD" ]; then \
+	elif [ "$$(OS)" = "FreeBSD" ]; then \
 		# Installing Docker on FreeBSD
 		echo "Installing Docker for FreeBSD..."; \
 		pkg install -y docker; \
