@@ -19,6 +19,7 @@ check_docker_installation:
 		DOCKER_COMMAND="docker"; \
 	elif [ "$$(uname -s)" = "FreeBSD" ]; then \
 		DOCKER_COMMAND="docker"; \
+		@echo "TTTTT"
 	else \
 		DOCKER_COMMAND="docker.exe"; \
 	fi; \
@@ -32,6 +33,7 @@ check_docker_installation:
 .PHONY: download_docker
 download_docker: check_docker_installation
 	OS := $(shell uname -s)
+	@echo "Aaaaaaa"
 	ifeq ($(OS),Darwin)
 		# Installing Docker on macOS
 		@echo "Installing Docker for macOS..."
@@ -52,6 +54,7 @@ download_docker: check_docker_installation
 	endif
 	ifeq ($(OS),FreeBSD)
 		# Installing Docker on FreeBSD
+		@echo "GGGGGG"
 		@echo "Installing Docker for FreeBSD..."
 		@pkg install -y docker
 		@echo 'docker_enable="YES"' >> /etc/rc.conf
