@@ -18,54 +18,48 @@ check_docker_installation:
 	elif [ "$$(uname -s)" = "Darwin" ]; then \
 		DOCKER_COMMAND="docker"; \
 	elif [ "$$(uname -s)" = "FreeBSD" ]; then \
-		DOCKER_COMMAND="docker"; \
-		@echo "TTTTT"
+    		DOCKER_COMMAND="docker"; \
 	else \
 		DOCKER_COMMAND="docker.exe"; \
 	fi; \
 	if ! command -v "$$DOCKER_COMMAND" >/dev/null; then \
 		echo "Docker is not installed. Installing Docker..."; \
-		$(MAKE) download_docker; \
+		$(MAKE) download_docker_internal; \
 	else \
 		echo "Docker is already installed."; \
 	fi
 
-.PHONY: download_docker
-download_docker: check_docker_installation
-	OS := $(shell uname -s)
-	@echo "Aaaaaaa"
-	ifeq ($(OS),Darwin)
-		# Installing Docker on macOS
-		@echo "Installing Docker for macOS..."
-		@curl -fsSL https://get.docker.com -o get-docker.sh
-		@sh get-docker.sh
-		@rm get-docker.sh
-		@echo "Docker installation completed."
-	endif
-	ifeq ($(OS),Linux)
-		# Installing Docker on Linux
-		@echo "Installing Docker for Linux..."
-		@curl -fsSL https://get.docker.com -o get-docker.sh
-		@sudo sh get-docker.sh
-		@sudo usermod -aG docker $(USER)
-		@rm get-docker.sh
-		@echo "Please log out and log back in to use Docker without sudo."
-		@echo "Docker installation completed."
-	endif
-	ifeq ($(OS),FreeBSD)
+.PHONY: download_docker_internal
+download_docker_internal:
+	@OS="$$(uname -s)"; \
+	if [ "$$OS" = "Darwin" ]; then \
+		echo "Installing Docker for macOS..."; \
+		curl -fsSL https://get.docker.com -o get-docker.sh; \
+		sh get-docker.sh; \
+		rm get-docker.sh; \
+		echo "Docker installation completed."; \
+	elif [ "$$OS" = "Linux" ]; then \
+		echo "Installing Docker for Linux..."; \
+		curl -fsSL https://get.docker.com -o get-docker.sh; \
+		sudo sh get-docker.sh; \
+		sudo usermod -aG docker $$(whoami); \
+		rm get-docker.sh; \
+		echo "Please log out and log back in to use Docker without sudo."; \
+	elif [ "$(OS)" = "FreeBSD" ]; then \
 		# Installing Docker on FreeBSD
-		@echo "GGGGGG"
-		@echo "Installing Docker for FreeBSD..."
-		@pkg install -y docker
-		@echo 'docker_enable="YES"' >> /etc/rc.conf
-		@service docker start
-		@echo "Docker installation completed."
-	endif
-	ifeq ($(OS),Windows_NT)
-		# Installing Docker on Windows
-		@echo "Please download Docker Desktop for Windows from the official website and follow the installation instructions:"
-		@echo "https://www.docker.com/products/docker-desktop"
-	endif
+		echo "Installing Docker for FreeBSD..."; \
+		pkg install -y docker; \
+		echo 'docker_enable="YES"' >> /etc/rc.conf; \
+		service docker start; \
+	else \
+		echo "Please download Docker Desktop for Windows from the official website and follow the installation instructions:"; \
+		echo "https://www.docker.com/products/docker-desktop"; \
+	fi
+
+.PHONY: download_docker
+download_docker: check_docker_installation download_docker_internal
+	@echo "Downloading Docker..."
+
 
 
 
