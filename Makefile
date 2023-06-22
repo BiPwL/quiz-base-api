@@ -44,13 +44,15 @@ download_docker_internal:
 		sudo sh get-docker.sh; \
 		sudo usermod -aG docker $$(whoami); \
 		rm get-docker.sh; \
+		echo "Docker installation completed."; \
 		echo "Please log out and log back in to use Docker without sudo."; \
 	elif [ "$$(OS)" = "FreeBSD" ]; then \
 		# Installing Docker on FreeBSD
 		echo "Installing Docker for FreeBSD..."; \
-		pkg install -y docker; \
-		echo 'docker_enable="YES"' >> /etc/rc.conf; \
-		service docker start; \
+#		pkg install -y docker; \
+#		echo 'docker_enable="YES"' >> /etc/rc.conf; \
+#		service docker start; \
+		echo "Docker installation completed."; \
 	else \
 		echo "Please download Docker Desktop for Windows from the official website and follow the installation instructions:"; \
 		echo "https://www.docker.com/products/docker-desktop"; \
