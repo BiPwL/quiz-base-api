@@ -24,8 +24,6 @@ check_docker_installation:
 	fi; \
 	if ! command -v "$$DOCKER_COMMAND" >/dev/null; then \
 		echo "Docker is not installed. Installing Docker..."; \
-		echo "aaaaaaaaaa"; \
-		uname -s; \
 		$(MAKE) download_docker_internal; \
 	else \
 		echo "Docker is already installed."; \
@@ -48,7 +46,7 @@ download_docker_internal:
 		rm get-docker.sh; \
 		echo "Docker installation completed."; \
 		echo "Please log out and log back in to use Docker without sudo."; \
-	elif [ "$$(OS)" = "FreeBSD" ]; then \
+	elif [ "$$OS" = "FreeBSD" ]; then \
 		# Installing Docker on FreeBSD \
 		echo "Installing Docker for FreeBSD..."; \
 #		pkg install -y docker; \
