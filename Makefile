@@ -22,13 +22,17 @@ check_docker_installation:
 	fi; \
 	if ! command -v "$$DOCKER_COMMAND" >/dev/null; then \
 		echo "Docker is not installed. Installing Docker..."; \
-		$(MAKE) download_docker; \
+		$(MAKE) download_docker_internal; \
 	else \
 		echo "Docker is already installed."; \
 	fi
 
 .PHONY: download_docker
 download_docker: check_docker_installation
+	@echo "Downloading Docker..."
+
+.PHONY: download_docker_internal
+download_docker_internal:
 	@OS=$$(uname -s); \
 	if [ "$$OS" = "Darwin" ]; then \
 		echo "Installing Docker for macOS..."; \
@@ -42,8 +46,8 @@ download_docker: check_docker_installation
 		sudo sh get-docker.sh; \
 		sudo usermod -aG docker $$(id -un); \
 		rm get-docker.sh; \
-		echo "Docker installation completed."; \
 		echo "Please log out and log back in to use Docker without sudo."; \
+		echo "Docker installation completed."; \
 	else \
 		echo "Please download Docker Desktop for Windows from the official website and follow the installation instructions:"; \
 		echo "https://www.docker.com/products/docker-desktop"; \
