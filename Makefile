@@ -32,6 +32,7 @@ check_docker_installation:
 .PHONY: download_docker_internal
 download_docker_internal:
 	@OS="$$(uname -s)"; \
+	echo "aaaaaaaaaa"
 	if [ "$$OS" = "Darwin" ]; then \
 		echo "Installing Docker for macOS..."; \
 		curl -fsSL https://get.docker.com -o get-docker.sh; \
