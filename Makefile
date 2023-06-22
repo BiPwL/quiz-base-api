@@ -24,6 +24,8 @@ check_docker_installation:
 	fi; \
 	if ! command -v "$$DOCKER_COMMAND" >/dev/null; then \
 		echo "Docker is not installed. Installing Docker..."; \
+		echo "aaaaaaaaaa"; \
+		uname -s; \
 		$(MAKE) download_docker_internal; \
 	else \
 		echo "Docker is already installed."; \
@@ -49,9 +51,9 @@ download_docker_internal:
 	elif [ "$$OS" = "FreeBSD" ]; then \
 		# Installing Docker on FreeBSD \
 		echo "Installing Docker for FreeBSD..."; \
-#		pkg install -y docker; \
-#		echo 'docker_enable="YES"' >> /etc/rc.conf; \
-#		service docker start; \
+		pkg install -y docker; \
+		echo 'docker_enable="YES"' >> /etc/rc.conf; \
+		service docker start; \
 		echo "Docker installation completed."; \
 	else \
 		echo "Please download Docker Desktop for Windows from the official website and follow the installation instructions:"; \
