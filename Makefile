@@ -24,7 +24,7 @@ check_docker_installation:
 	fi; \
 	if ! command -v "$$DOCKER_COMMAND" >/dev/null; then \
 		echo "Docker is not installed. Installing Docker..."; \
-		$(MAKE) install_docker; \
+		$(MAKE) download_docker; \
 	else \
 		echo "Docker is already installed."; \
 	fi
