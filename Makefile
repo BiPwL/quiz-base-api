@@ -49,7 +49,6 @@ download_docker_internal:
 		echo "Docker installation completed."; \
 		echo "Please log out and log back in to use Docker without sudo."; \
 	elif [ "$$OS" = "FreeBSD" ]; then \
-		echo "Installing Docker on FreeBSD..."; \
 		echo "Installing Docker for FreeBSD..."; \
 		pkg install -y docker; \
 		echo 'docker_enable="YES"' >> /etc/rc.conf; \
