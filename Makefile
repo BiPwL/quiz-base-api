@@ -24,6 +24,8 @@ check_docker_installation:
 	fi; \
 	if ! command -v "$$DOCKER_COMMAND" >/dev/null; then \
 		echo "Docker is not installed. Installing Docker..."; \
+		echo "aaaaaaaaaa"; \
+		uname -s; \
 		$(MAKE) download_docker_internal; \
 	else \
 		echo "Docker is already installed."; \
@@ -32,9 +34,6 @@ check_docker_installation:
 .PHONY: download_docker_internal
 download_docker_internal:
 	@OS="$$(uname -s)"; \
-	echo "aaaaaaaaaa"; \
-	echo "$$OS"; \
-	echo $$OS; \
 	if [ "$$OS" = "Darwin" ]; then \
 		echo "Installing Docker for macOS..."; \
 		curl -fsSL https://get.docker.com -o get-docker.sh; \
