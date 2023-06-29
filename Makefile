@@ -90,11 +90,11 @@ exec_db:
 
 .PHONY: migrate_up
 migrate_up:
-	migrate -path migrations -database "postgresql://root:secret@localhost:5432/quiz_base?sslmode=disable" -verbose up;
+	migrate -path db/migrations -database "postgresql://root:secret@localhost:5432/quiz_base?sslmode=disable" -verbose up;
 
 .PHONY: migrate_down
 migrate_down:
-	migrate -path migrations -database "postgresql://root:secret@localhost:5432/quiz_base?sslmode=disable" -verbose down;
+	migrate -path db/migrations -database "postgresql://root:secret@localhost:5432/quiz_base?sslmode=disable" -verbose down;
 
 
 #********************************************
