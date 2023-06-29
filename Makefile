@@ -96,6 +96,9 @@ migrate_up:
 migrate_down:
 	migrate -path db/migrations -database "postgresql://root:secret@localhost:5432/quiz_base?sslmode=disable" -verbose down;
 
+.PHONY: sqlc
+sqlc:
+	sqlc generate
 
 #********************************************
 
