@@ -76,6 +76,27 @@ start_container:
 exec_container:
 	docker exec -it db psql -U root;
 
+.PHONY: create_db
+create_db:
+	docker exec -it db createdb --username=root --owner=root quiz_base;
+
+.PHONY: drop_db
+drop_db:
+	docker exec -it db dropdb quiz_base;
+
+.PHONY: exec_db
+exec_db:
+	docker exec -it db psql quiz_base;
+
+.PHONY: migrate_up
+migrate_up:
+	migrate -path migrations -database "postgresql://root:secret@localhost:5432/quiz_base?sslmode=disable" -verbose up;
+
+.PHONY: migrate_down
+migrate_down:
+	migrate -path migrations -database "postgresql://root:secret@localhost:5432/quiz_base?sslmode=disable" -verbose down;
+
+
 #********************************************
 
 #commands for quick project deployment
