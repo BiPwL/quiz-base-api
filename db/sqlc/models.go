@@ -16,16 +16,17 @@ type Answer struct {
 }
 
 type AnsweredQuestion struct {
+	ID         int64     `json:"id"`
 	UserID     int64     `json:"user_id"`
 	QuestionID int64     `json:"question_id"`
 	AnsweredAt time.Time `json:"answered_at"`
 }
 
 type Category struct {
-	// name for user
-	Name string `json:"name"`
 	// name for dev
 	Key string `json:"key"`
+	// name for user
+	Name string `json:"name"`
 }
 
 type Question struct {
