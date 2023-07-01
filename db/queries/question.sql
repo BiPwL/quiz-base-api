@@ -19,8 +19,8 @@ LIMIT $1 OFFSET $2;
 
 -- name: UpdateQuestion :one
 UPDATE "questions"
-SET "text" = CASE WHEN $3 = 'text' THEN $2 ELSE "text" END,
-    "hint" = CASE WHEN $3 = 'hint' THEN $2 ELSE "hint" END
+SET "text" = $2,
+    "hint" = $3
 WHERE "id" = $1
 RETURNING *;
 

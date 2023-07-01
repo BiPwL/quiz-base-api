@@ -107,20 +107,20 @@ func (q *Queries) ListQuestions(ctx context.Context, arg ListQuestionsParams) ([
 
 const updateQuestion = `-- name: UpdateQuestion :one
 UPDATE "questions"
-SET "text" = CASE WHEN $3 = 'text' THEN $2 ELSE "text" END,
-    "hint" = CASE WHEN $3 = 'hint' THEN $2 ELSE "hint" END
+SET "text" = $2,
+    "hint" = $3
 WHERE "id" = $1
 RETURNING id, text, hint, category
 `
 
 type UpdateQuestionParams struct {
-	ID      int64       `json:"id"`
-	Text    string      `json:"text"`
-	Column3 interface{} `json:"column_3"`
+	ID   int64  `json:"id"`
+	Text string `json:"text"`
+	Hint string `json:"hint"`
 }
 
 func (q *Queries) UpdateQuestion(ctx context.Context, arg UpdateQuestionParams) (Question, error) {
-	row := q.db.QueryRowContext(ctx, updateQuestion, arg.ID, arg.Text, arg.Column3)
+	row := q.db.QueryRowContext(ctx, updateQuestion, arg.ID, arg.Text, arg.Hint)
 	var i Question
 	err := row.Scan(
 		&i.ID,
