@@ -107,20 +107,20 @@ func (q *Queries) ListAnswers(ctx context.Context, arg ListAnswersParams) ([]Ans
 
 const updateAnswer = `-- name: UpdateAnswer :one
 UPDATE "answers"
-SET "text"       = CASE WHEN $3 = 'text' THEN $2 ELSE "text" END,
-    "is_correct" = CASE WHEN $3 = 'is_correct' THEN $2 ELSE "is_correct" END
+SET "text" = $2,
+    "is_correct" = $3
 WHERE "id" = $1
 RETURNING id, question_id, text, is_correct
 `
 
 type UpdateAnswerParams struct {
-	ID      int64       `json:"id"`
-	Text    string      `json:"text"`
-	Column3 interface{} `json:"column_3"`
+	ID        int64  `json:"id"`
+	Text      string `json:"text"`
+	IsCorrect bool   `json:"is_correct"`
 }
 
 func (q *Queries) UpdateAnswer(ctx context.Context, arg UpdateAnswerParams) (Answer, error) {
-	row := q.db.QueryRowContext(ctx, updateAnswer, arg.ID, arg.Text, arg.Column3)
+	row := q.db.QueryRowContext(ctx, updateAnswer, arg.ID, arg.Text, arg.IsCorrect)
 	var i Answer
 	err := row.Scan(
 		&i.ID,

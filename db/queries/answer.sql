@@ -19,10 +19,11 @@ LIMIT $1 OFFSET $2;
 
 -- name: UpdateAnswer :one
 UPDATE "answers"
-SET "text"       = CASE WHEN $3 = 'text' THEN $2 ELSE "text" END,
-    "is_correct" = CASE WHEN $3 = 'is_correct' THEN $2 ELSE "is_correct" END
+SET "text" = $2,
+    "is_correct" = $3
 WHERE "id" = $1
 RETURNING *;
+
 
 -- name: DeleteAnswer :exec
 DELETE
