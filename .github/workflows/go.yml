@@ -43,8 +43,8 @@ jobs:
           sudo mv migrate /usr/bin/migrate
           which migrate
           
-          - name: Run migrations
-            run: make migrate_up
-          
-          - name: Test
-            run: make test
+      - name: Run migrations
+        run: make migrate_up
+
+      - name: Test
+        run: make test
