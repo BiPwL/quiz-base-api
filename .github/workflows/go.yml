@@ -44,7 +44,7 @@ jobs:
           pwd
           ls ~/Downloads/
           sudo touch /usr/bin/migrate
-          sudo mv migrate.linux-amd64 /usr/bin/migrate
+          sudo mv migrate /usr/bin/migrate
           which migrate
           
           - name: Run migrations
