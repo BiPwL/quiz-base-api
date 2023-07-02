@@ -17,6 +17,7 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
+// randomStrWithAlphabet returns random string with your alphabet
 func randomStrWithAlphabet(n int, alphabet string) string {
 	var sb strings.Builder
 	k := len(alphabet)
