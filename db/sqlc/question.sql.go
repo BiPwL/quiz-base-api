@@ -83,7 +83,7 @@ func (q *Queries) ListQuestions(ctx context.Context, arg ListQuestionsParams) ([
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Question
+	items := []Question{}
 	for rows.Next() {
 		var i Question
 		if err := rows.Scan(
