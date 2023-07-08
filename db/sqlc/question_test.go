@@ -3,9 +3,11 @@ package db
 import (
 	"context"
 	"database/sql"
-	"github.com/BiPwL/quiz-base-api/util"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/BiPwL/quiz-base-api/util"
 )
 
 func createRandomQuestion(t *testing.T) Question {
