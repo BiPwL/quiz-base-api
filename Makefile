@@ -8,6 +8,9 @@ test:
 	go test -v -cover -race -timeout 30s ./...;
 .DEFAULT_GOAL := build
 
+.PHONY: server
+server:
+	go run main.go
 #********************************************
 
 #docker
