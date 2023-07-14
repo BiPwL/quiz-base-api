@@ -13,7 +13,7 @@ LIMIT 1;
 -- name: ListCategories :many
 SELECT *
 FROM "categories"
-ORDER BY "key"
+ORDER BY "created_at"
 LIMIT $1 OFFSET $2;
 
 -- name: UpdateCategory :one

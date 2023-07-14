@@ -26,6 +26,7 @@ func NewServer(store *db.Store) *Server {
 	// Category handlers
 	router.POST("categories/new", server.createCategory)
 	router.GET("categories/:key", server.getCategory)
+	router.GET("categories", server.listCategories)
 
 	server.router = router
 	return server
