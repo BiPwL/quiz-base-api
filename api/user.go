@@ -110,3 +110,29 @@ func (server *Server) deleteUser(ctx *gin.Context) {
 
 	ctx.Status(http.StatusOK)
 }
+
+type updateUserParams struct {
+	ID       int64  `json:"id" binding:"required,min=1"`
+	Password string `json:"password" binding:"required"`
+}
+
+func (server *Server) updateUser(ctx *gin.Context) {
+	var req updateUserParams
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdateUserParams{
+		ID:       req.ID,
+		Password: req.Password,
+	}
+
+	user, err := server.store.UpdateUser(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, user)
+}
