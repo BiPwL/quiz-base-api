@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createCategory = `-- name: CreateCategory :one
@@ -35,8 +36,18 @@ WHERE "key" = $1
 `
 
 func (q *Queries) DeleteCategory(ctx context.Context, key string) error {
-	_, err := q.db.ExecContext(ctx, deleteCategory, key)
-	return err
+	result, err := q.db.ExecContext(ctx, deleteUser, key)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+	return nil
 }
 
 const getCategory = `-- name: GetCategory :one
