@@ -85,3 +85,28 @@ func (server *Server) listCategories(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, categories)
 }
+
+type deleteCategoryRequest struct {
+	Key string `uri:"key" binding:"required"`
+}
+
+func (server *Server) deleteCategory(ctx *gin.Context) {
+	var req deleteCategoryRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	err := server.store.DeleteCategory(ctx, req.Key)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
