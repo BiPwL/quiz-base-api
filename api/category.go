@@ -110,3 +110,29 @@ func (server *Server) deleteCategory(ctx *gin.Context) {
 
 	ctx.Status(http.StatusOK)
 }
+
+type updateCategoryParams struct {
+	Key  string `json:"key" binding:"required"`
+	Name string `json:"name" binding:"required"`
+}
+
+func (server *Server) updateCategory(ctx *gin.Context) {
+	var req updateCategoryParams
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdateCategoryParams{
+		Key:  req.Key,
+		Name: req.Name,
+	}
+
+	category, err := server.store.UpdateCategory(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, category)
+}
