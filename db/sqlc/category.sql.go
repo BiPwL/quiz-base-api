@@ -36,7 +36,7 @@ WHERE "key" = $1
 `
 
 func (q *Queries) DeleteCategory(ctx context.Context, key string) error {
-	result, err := q.db.ExecContext(ctx, deleteUser, key)
+	result, err := q.db.ExecContext(ctx, deleteCategory, key)
 	if err != nil {
 		return err
 	}
