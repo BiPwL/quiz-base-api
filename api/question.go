@@ -112,3 +112,31 @@ func (server *Server) deleteQuestion(ctx *gin.Context) {
 
 	ctx.Status(http.StatusOK)
 }
+
+type updateQuestionParams struct {
+	ID   int64  `json:"id" binding:"required,min=1"`
+	Text string `json:"text" binding:"required"`
+	Hint string `json:"hint" binding:"required"`
+}
+
+func (server *Server) updateQuestion(ctx *gin.Context) {
+	var req updateQuestionParams
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdateQuestionParams{
+		ID:   req.ID,
+		Text: req.Text,
+		Hint: req.Hint,
+	}
+
+	question, err := server.store.UpdateQuestion(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, question)
+}
