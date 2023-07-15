@@ -44,7 +44,7 @@ WHERE "id" = $1
 `
 
 func (q *Queries) DeleteQuestion(ctx context.Context, id int64) error {
-	result, err := q.db.ExecContext(ctx, deleteUser, id)
+	result, err := q.db.ExecContext(ctx, deleteQuestion, id)
 	if err != nil {
 		return err
 	}
