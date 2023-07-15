@@ -4,31 +4,31 @@ CREATE TABLE "answers"
     "question_id" bigint                NOT NULL,
     "text"        varchar               NOT NULL,
     "is_correct"  bool                  NOT NULL DEFAULT False,
-    "created_at" TIMESTAMP             NOT NULL DEFAULT (now())
+    "created_at"  TIMESTAMP             NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "questions"
 (
-    "id"       BIGSERIAL PRIMARY KEY NOT NULL,
-    "text"     varchar               NOT NULL,
-    "hint"     varchar               NOT NULL,
-    "category" varchar               NOT NULL,
+    "id"         BIGSERIAL PRIMARY KEY NOT NULL,
+    "text"       varchar UNIQUE        NOT NULL,
+    "hint"       varchar               NOT NULL,
+    "category"   varchar               NOT NULL,
     "created_at" TIMESTAMP             NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "categories"
 (
-    "key"  varchar UNIQUE NOT NULL,
-    "name" varchar UNIQUE NOT NULL,
-    "created_at" TIMESTAMP             NOT NULL DEFAULT (now())
+    "key"        varchar UNIQUE NOT NULL,
+    "name"       varchar UNIQUE NOT NULL,
+    "created_at" TIMESTAMP      NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "answered_questions"
 (
     "id"          BIGSERIAL PRIMARY KEY NOT NULL,
-    "user_id"     bigint    NOT NULL,
-    "question_id" bigint    NOT NULL,
-    "answered_at" TIMESTAMP NOT NULL DEFAULT (now())
+    "user_id"     bigint                NOT NULL,
+    "question_id" bigint                NOT NULL,
+    "answered_at" TIMESTAMP             NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "users"
