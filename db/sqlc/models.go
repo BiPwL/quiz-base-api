@@ -9,10 +9,11 @@ import (
 )
 
 type Answer struct {
-	ID         int64  `json:"id"`
-	QuestionID int64  `json:"question_id"`
-	Text       string `json:"text"`
-	IsCorrect  bool   `json:"is_correct"`
+	ID         int64     `json:"id"`
+	QuestionID int64     `json:"question_id"`
+	Text       string    `json:"text"`
+	IsCorrect  bool      `json:"is_correct"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 type AnsweredQuestion struct {
@@ -26,14 +27,16 @@ type Category struct {
 	// name for dev
 	Key string `json:"key"`
 	// name for user
-	Name string `json:"name"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type Question struct {
-	ID       int64  `json:"id"`
-	Text     string `json:"text"`
-	Hint     string `json:"hint"`
-	Category string `json:"category"`
+	ID        int64     `json:"id"`
+	Text      string    `json:"text"`
+	Hint      string    `json:"hint"`
+	Category  string    `json:"category"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type User struct {

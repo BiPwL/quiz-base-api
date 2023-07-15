@@ -14,7 +14,7 @@ INSERT INTO "questions" ("text",
                          "hint",
                          "category")
 VALUES ($1, $2, $3)
-RETURNING id, text, hint, category
+RETURNING id, text, hint, category, created_at
 `
 
 type CreateQuestionParams struct {
@@ -31,6 +31,7 @@ func (q *Queries) CreateQuestion(ctx context.Context, arg CreateQuestionParams) 
 		&i.Text,
 		&i.Hint,
 		&i.Category,
+		&i.CreatedAt,
 	)
 	return i, err
 }
@@ -47,7 +48,7 @@ func (q *Queries) DeleteQuestion(ctx context.Context, id int64) error {
 }
 
 const getQuestion = `-- name: GetQuestion :one
-SELECT id, text, hint, category
+SELECT id, text, hint, category, created_at
 FROM "questions"
 WHERE "id" = $1
 LIMIT 1
@@ -61,12 +62,13 @@ func (q *Queries) GetQuestion(ctx context.Context, id int64) (Question, error) {
 		&i.Text,
 		&i.Hint,
 		&i.Category,
+		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const listQuestions = `-- name: ListQuestions :many
-SELECT id, text, hint, category
+SELECT id, text, hint, category, created_at
 FROM "questions"
 ORDER BY "id"
 LIMIT $1 OFFSET $2
@@ -91,6 +93,7 @@ func (q *Queries) ListQuestions(ctx context.Context, arg ListQuestionsParams) ([
 			&i.Text,
 			&i.Hint,
 			&i.Category,
+			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -110,7 +113,7 @@ UPDATE "questions"
 SET "text" = $2,
     "hint" = $3
 WHERE "id" = $1
-RETURNING id, text, hint, category
+RETURNING id, text, hint, category, created_at
 `
 
 type UpdateQuestionParams struct {
@@ -127,6 +130,7 @@ func (q *Queries) UpdateQuestion(ctx context.Context, arg UpdateQuestionParams) 
 		&i.Text,
 		&i.Hint,
 		&i.Category,
+		&i.CreatedAt,
 	)
 	return i, err
 }

@@ -14,7 +14,7 @@ INSERT INTO "answers" ("question_id",
                        "text",
                        "is_correct")
 VALUES ($1, $2, $3)
-RETURNING id, question_id, text, is_correct
+RETURNING id, question_id, text, is_correct, created_at
 `
 
 type CreateAnswerParams struct {
@@ -31,6 +31,7 @@ func (q *Queries) CreateAnswer(ctx context.Context, arg CreateAnswerParams) (Ans
 		&i.QuestionID,
 		&i.Text,
 		&i.IsCorrect,
+		&i.CreatedAt,
 	)
 	return i, err
 }
@@ -47,7 +48,7 @@ func (q *Queries) DeleteAnswer(ctx context.Context, id int64) error {
 }
 
 const getAnswer = `-- name: GetAnswer :one
-SELECT id, question_id, text, is_correct
+SELECT id, question_id, text, is_correct, created_at
 FROM "answers"
 WHERE "id" = $1
 LIMIT 1
@@ -61,12 +62,13 @@ func (q *Queries) GetAnswer(ctx context.Context, id int64) (Answer, error) {
 		&i.QuestionID,
 		&i.Text,
 		&i.IsCorrect,
+		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const listAnswers = `-- name: ListAnswers :many
-SELECT id, question_id, text, is_correct
+SELECT id, question_id, text, is_correct, created_at
 FROM "answers"
 ORDER BY "id"
 LIMIT $1 OFFSET $2
@@ -91,6 +93,7 @@ func (q *Queries) ListAnswers(ctx context.Context, arg ListAnswersParams) ([]Ans
 			&i.QuestionID,
 			&i.Text,
 			&i.IsCorrect,
+			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -110,7 +113,7 @@ UPDATE "answers"
 SET "text" = $2,
     "is_correct" = $3
 WHERE "id" = $1
-RETURNING id, question_id, text, is_correct
+RETURNING id, question_id, text, is_correct, created_at
 `
 
 type UpdateAnswerParams struct {
@@ -127,6 +130,7 @@ func (q *Queries) UpdateAnswer(ctx context.Context, arg UpdateAnswerParams) (Ans
 		&i.QuestionID,
 		&i.Text,
 		&i.IsCorrect,
+		&i.CreatedAt,
 	)
 	return i, err
 }

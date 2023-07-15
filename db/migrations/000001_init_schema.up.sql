@@ -3,7 +3,8 @@ CREATE TABLE "answers"
     "id"          BIGSERIAL PRIMARY KEY NOT NULL,
     "question_id" bigint                NOT NULL,
     "text"        varchar               NOT NULL,
-    "is_correct"  bool                  NOT NULL DEFAULT False
+    "is_correct"  bool                  NOT NULL DEFAULT False,
+    "created_at" TIMESTAMP             NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "questions"
@@ -11,13 +12,15 @@ CREATE TABLE "questions"
     "id"       BIGSERIAL PRIMARY KEY NOT NULL,
     "text"     varchar               NOT NULL,
     "hint"     varchar               NOT NULL,
-    "category" varchar               NOT NULL
+    "category" varchar               NOT NULL,
+    "created_at" TIMESTAMP             NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "categories"
 (
     "key"  varchar UNIQUE NOT NULL,
-    "name" varchar UNIQUE NOT NULL
+    "name" varchar UNIQUE NOT NULL,
+    "created_at" TIMESTAMP             NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "answered_questions"
