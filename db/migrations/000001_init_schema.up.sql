@@ -11,7 +11,7 @@ CREATE TABLE "questions"
 (
     "id"         BIGSERIAL PRIMARY KEY NOT NULL,
     "text"       varchar UNIQUE        NOT NULL,
-    "hint"       varchar UNIQUE        NOT NULL,
+    "hint"       varchar               NOT NULL,
     "category"   varchar               NOT NULL,
     "created_at" TIMESTAMP             NOT NULL DEFAULT (now())
 );
