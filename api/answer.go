@@ -112,3 +112,45 @@ func (server *Server) deleteAnswer(ctx *gin.Context) {
 
 	ctx.Status(http.StatusOK)
 }
+
+type updateAnswerParams struct {
+	ID        int64  `json:"id" binding:"required,min=1"`
+	Text      string `json:"text" binding:"omitempty"`
+	IsCorrect *bool  `json:"is_correct" binding:"omitempty"`
+}
+
+func (server *Server) updateAnswer(ctx *gin.Context) {
+	var req updateAnswerParams
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	currentAnswer, err := server.store.GetAnswer(ctx, req.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	if req.Text == "" {
+		req.Text = currentAnswer.Text
+	}
+
+	if req.IsCorrect == nil {
+		req.IsCorrect = &currentAnswer.IsCorrect
+	}
+
+	arg := db.UpdateAnswerParams{
+		ID:        req.ID,
+		Text:      req.Text,
+		IsCorrect: *req.IsCorrect,
+	}
+
+	answer, err := server.store.UpdateAnswer(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, answer)
+}
