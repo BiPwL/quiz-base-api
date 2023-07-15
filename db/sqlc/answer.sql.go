@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createAnswer = `-- name: CreateAnswer :one
@@ -43,8 +44,18 @@ WHERE "id" = $1
 `
 
 func (q *Queries) DeleteAnswer(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, deleteAnswer, id)
-	return err
+	result, err := q.db.ExecContext(ctx, deleteAnswer, id)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+	return nil
 }
 
 const getAnswer = `-- name: GetAnswer :one
