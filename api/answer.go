@@ -12,7 +12,7 @@ import (
 type createAnswerRequest struct {
 	QuestionID int64  `json:"question_id" binding:"required"`
 	Text       string `json:"text" binding:"required"`
-	IsCorrect  bool   `json:"is_correct"`
+	IsCorrect  bool   `json:"is_correct" binding:"omitempty"`
 }
 
 func (server *Server) createAnswer(ctx *gin.Context) {
