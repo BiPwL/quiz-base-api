@@ -43,6 +43,7 @@ func NewServer(store *db.Store) *Server {
 	router.POST("answers", server.updateAnswer)
 	// Answered Questions handlers
 	router.POST("answered_questions/new", server.createAnsweredQuestion)
+	router.GET("answered_questions/:id", server.getAnsweredQuestion)
 
 	server.router = router
 	return server
