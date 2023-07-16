@@ -53,7 +53,7 @@ CREATE INDEX ON "answered_questions" ("user_id");
 
 CREATE INDEX ON "answered_questions" ("question_id");
 
-CREATE INDEX ON "answered_questions" ("user_id", "question_id");
+CREATE UNIQUE INDEX "idx_unique_user_question" ON "answered_questions" ("user_id", "question_id");
 
 CREATE INDEX ON "users" ("id");
 
