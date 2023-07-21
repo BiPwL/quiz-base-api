@@ -105,7 +105,7 @@ func TestListCategoryQuestions(t *testing.T) {
 		require.NoError(t, err)
 	}
 
-	arg := listCategoryQuestionsParams{
+	arg := ListCategoryQuestionsParams{
 		Category: category.Key,
 		Limit:    2,
 		Offset:   0,
