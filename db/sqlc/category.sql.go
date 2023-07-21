@@ -126,13 +126,13 @@ ORDER BY "created_at"
 LIMIT $2 OFFSET $3
 `
 
-type listCategoryQuestionsParams struct {
+type ListCategoryQuestionsParams struct {
 	Category string `json:"category"`
 	Limit    int32  `json:"limit"`
 	Offset   int32  `json:"offset"`
 }
 
-func (q *Queries) ListCategoryQuestions(ctx context.Context, arg listCategoryQuestionsParams) ([]Question, error) {
+func (q *Queries) ListCategoryQuestions(ctx context.Context, arg ListCategoryQuestionsParams) ([]Question, error) {
 	rows, err := q.db.QueryContext(ctx, listCategoryQuestions, arg.Category, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
