@@ -26,3 +26,10 @@ RETURNING *;
 DELETE
 FROM "categories"
 WHERE "key" = $1;
+
+-- name: ListCategoryQuestions :many
+SELECT *
+FROM questions
+WHERE category = $1
+ORDER BY "created_at"
+LIMIT $2 OFFSET $3;
