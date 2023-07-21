@@ -32,3 +32,8 @@ FROM questions
 WHERE category = $1
 ORDER BY "created_at"
 LIMIT $2 OFFSET $3;
+
+-- name: GetCategoryQuestionsCount :one
+SELECT COUNT(*)
+FROM questions
+WHERE category = $1;
