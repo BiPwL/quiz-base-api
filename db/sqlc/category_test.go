@@ -123,3 +123,26 @@ func TestListCategoryQuestions(t *testing.T) {
 		require.WithinDuration(t, expectedQuestions[i].CreatedAt, question.CreatedAt, time.Second)
 	}
 }
+
+func TestGetCategoryQuestionsCount(t *testing.T) {
+	category := createRandomCategory(t)
+
+	for i := 0; i < 3; i++ {
+		question := CreateQuestionParams{
+			Text:     util.RandomStr(8),
+			Hint:     util.RandomStr(6),
+			Category: category.Key,
+		}
+		_, err := testQueries.CreateQuestion(context.Background(), question)
+		require.NoError(t, err)
+	}
+
+	count, err := testQueries.GetCategoryQuestionsCount(context.Background(), category.Key)
+	require.NoError(t, err)
+	require.Equal(t, int64(3), count)
+
+	nonExistentCategory := "non_existent_category"
+	nonExistentCount, err := testQueries.GetCategoryQuestionsCount(context.Background(), nonExistentCategory)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), nonExistentCount)
+}
