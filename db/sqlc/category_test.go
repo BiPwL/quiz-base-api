@@ -91,16 +91,15 @@ func TestListCategories(t *testing.T) {
 
 func TestListCategoryQuestions(t *testing.T) {
 	category := createRandomCategory(t)
-
-	startQuestions := []CreateQuestionParams{
-		{Text: util.RandomStr(8), Hint: util.RandomStr(6), Category: category.Key},
-		{Text: util.RandomStr(8), Hint: util.RandomStr(6), Category: category.Key},
-	}
-
 	expectedQuestions := [2]Question{}
 	var err error
 
-	for i, question := range startQuestions {
+	for i := 0; i < 2; i++ {
+		question := CreateQuestionParams{
+			Text:     util.RandomStr(8),
+			Hint:     util.RandomStr(6),
+			Category: category.Key,
+		}
 		expectedQuestions[i], err = testQueries.CreateQuestion(context.Background(), question)
 		require.NoError(t, err)
 	}
