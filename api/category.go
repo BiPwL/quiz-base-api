@@ -164,3 +164,34 @@ func (server *Server) listCategoryQuestions(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, questions)
 }
+
+type getCategoryQuestionsCountRequest struct {
+	Key string `uri:"key" binding:"required"`
+}
+
+func (server *Server) getCategoryQuestionsCount(ctx *gin.Context) {
+	var req getCategoryQuestionsCountRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	_, err := server.store.GetCategory(ctx, req.Key)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	questionsCount, err := server.store.GetCategoryQuestionsCount(ctx, req.Key)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, questionsCount)
+}
