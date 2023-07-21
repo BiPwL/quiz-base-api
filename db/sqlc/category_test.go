@@ -3,9 +3,12 @@ package db
 import (
 	"context"
 	"database/sql"
-	"github.com/BiPwL/quiz-base-api/util"
-	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/BiPwL/quiz-base-api/util"
 )
 
 func createRandomCategory(t *testing.T) Category {
@@ -83,5 +86,41 @@ func TestListCategories(t *testing.T) {
 
 	for _, category := range categories {
 		require.NotEmpty(t, category)
+	}
+}
+
+func TestListCategoryQuestions(t *testing.T) {
+	category := createRandomCategory(t)
+
+	startQuestions := []CreateQuestionParams{
+		{Text: util.RandomStr(8), Hint: util.RandomStr(6), Category: category.Key},
+		{Text: util.RandomStr(8), Hint: util.RandomStr(6), Category: category.Key},
+	}
+
+	expectedQuestions := [2]Question{}
+	var err error
+
+	for i, question := range startQuestions {
+		expectedQuestions[i], err = testQueries.CreateQuestion(context.Background(), question)
+		require.NoError(t, err)
+	}
+
+	arg := listCategoryQuestionsParams{
+		Category: category.Key,
+		Limit:    2,
+		Offset:   0,
+	}
+
+	questions, err := testQueries.ListCategoryQuestions(context.Background(), arg)
+	require.NoError(t, err)
+	require.Len(t, questions, 2)
+
+	for i, question := range questions {
+		require.NotEmpty(t, question)
+		require.Equal(t, expectedQuestions[i].ID, question.ID)
+		require.Equal(t, expectedQuestions[i].Text, question.Text)
+		require.Equal(t, expectedQuestions[i].Hint, question.Hint)
+		require.Equal(t, expectedQuestions[i].Category, question.Category)
+		require.WithinDuration(t, expectedQuestions[i].CreatedAt, question.CreatedAt, time.Second)
 	}
 }
