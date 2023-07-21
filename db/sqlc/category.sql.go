@@ -54,7 +54,6 @@ const getCategory = `-- name: GetCategory :one
 SELECT key, name, created_at
 FROM "categories"
 WHERE "key" = $1
-LIMIT 1
 `
 
 func (q *Queries) GetCategory(ctx context.Context, key string) (Category, error) {
@@ -62,6 +61,19 @@ func (q *Queries) GetCategory(ctx context.Context, key string) (Category, error)
 	var i Category
 	err := row.Scan(&i.Key, &i.Name, &i.CreatedAt)
 	return i, err
+}
+
+const getCategoryQuestionsCount = `-- name: GetCategoryQuestionsCount :one
+SELECT COUNT(*)
+FROM questions
+WHERE category = $1
+`
+
+func (q *Queries) GetCategoryQuestionsCount(ctx context.Context, category string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getCategoryQuestionsCount, category)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
 }
 
 const listCategories = `-- name: ListCategories :many
@@ -99,26 +111,7 @@ func (q *Queries) ListCategories(ctx context.Context, arg ListCategoriesParams) 
 	return items, nil
 }
 
-const updateCategory = `-- name: UpdateCategory :one
-UPDATE "categories"
-SET "name" = $2
-WHERE "key" = $1
-RETURNING key, name, created_at
-`
-
-type UpdateCategoryParams struct {
-	Key  string `json:"key"`
-	Name string `json:"name"`
-}
-
-func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) (Category, error) {
-	row := q.db.QueryRowContext(ctx, updateCategory, arg.Key, arg.Name)
-	var i Category
-	err := row.Scan(&i.Key, &i.Name, &i.CreatedAt)
-	return i, err
-}
-
-const listCategoryQuestions = `-- name: listCategoryQuestions :many
+const listCategoryQuestions = `-- name: ListCategoryQuestions :many
 SELECT id, text, hint, category, created_at
 FROM questions
 WHERE category = $1
@@ -159,4 +152,23 @@ func (q *Queries) ListCategoryQuestions(ctx context.Context, arg ListCategoryQue
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateCategory = `-- name: UpdateCategory :one
+UPDATE "categories"
+SET "name" = $2
+WHERE "key" = $1
+RETURNING key, name, created_at
+`
+
+type UpdateCategoryParams struct {
+	Key  string `json:"key"`
+	Name string `json:"name"`
+}
+
+func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) (Category, error) {
+	row := q.db.QueryRowContext(ctx, updateCategory, arg.Key, arg.Name)
+	var i Category
+	err := row.Scan(&i.Key, &i.Name, &i.CreatedAt)
+	return i, err
 }
