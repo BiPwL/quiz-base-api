@@ -7,8 +7,7 @@ RETURNING *;
 -- name: GetCategory :one
 SELECT *
 FROM "categories"
-WHERE "key" = $1
-LIMIT 1;
+WHERE "key" = $1;
 
 -- name: ListCategories :many
 SELECT *
