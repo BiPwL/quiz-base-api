@@ -111,13 +111,13 @@ func (server *Server) deleteCategory(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-type updateCategoryParams struct {
+type updateCategoryRequest struct {
 	Key  string `json:"key" binding:"required"`
 	Name string `json:"name" binding:"required"`
 }
 
 func (server *Server) updateCategory(ctx *gin.Context) {
-	var req updateCategoryParams
+	var req updateCategoryRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -137,14 +137,14 @@ func (server *Server) updateCategory(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, category)
 }
 
-type listCategoryQuestions struct {
+type listCategoryQuestionsRequest struct {
 	Category string `form:"category" binding:"required"`
 	PageID   int32  `form:"page_id" binding:"required,min=1"`
 	PageSize int32  `form:"page_size" binding:"required,min=5,max=10"`
 }
 
-func (server *Server) ListCategoryQuestions(ctx *gin.Context) {
-	var req listCategoryQuestions
+func (server *Server) listCategoryQuestions(ctx *gin.Context) {
+	var req listCategoryQuestionsRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
