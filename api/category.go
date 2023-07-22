@@ -97,7 +97,7 @@ func (server *Server) deleteCategory(ctx *gin.Context) {
 		return
 	}
 
-	err := server.store.DeleteCategory(ctx, req.Key)
+	_, err := server.store.GetCategory(ctx, req.Key)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -108,16 +108,22 @@ func (server *Server) deleteCategory(ctx *gin.Context) {
 		return
 	}
 
+	err = server.store.DeleteCategory(ctx, req.Key)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
 	ctx.Status(http.StatusOK)
 }
 
-type updateCategoryParams struct {
+type updateCategoryRequest struct {
 	Key  string `json:"key" binding:"required"`
 	Name string `json:"name" binding:"required"`
 }
 
 func (server *Server) updateCategory(ctx *gin.Context) {
-	var req updateCategoryParams
+	var req updateCategoryRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -135,4 +141,73 @@ func (server *Server) updateCategory(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, category)
+}
+
+type listCategoryQuestionsRequest struct {
+	Category string `form:"category" binding:"required"`
+	PageID   int32  `form:"page_id" binding:"required,min=1"`
+	PageSize int32  `form:"page_size" binding:"required,min=5,max=10"`
+}
+
+func (server *Server) listCategoryQuestions(ctx *gin.Context) {
+	var req listCategoryQuestionsRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.ListCategoryQuestionsParams{
+		Category: req.Category,
+		Limit:    req.PageSize,
+		Offset:   (req.PageID - 1) * req.PageSize,
+	}
+
+	questions, err := server.store.ListCategoryQuestions(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, questions)
+}
+
+type getCategoryQuestionsCountRequest struct {
+	Key string `uri:"key" binding:"required"`
+}
+
+func (server *Server) getCategoryQuestionsCount(ctx *gin.Context) {
+	var req getCategoryQuestionsCountRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	_, err := server.store.GetCategory(ctx, req.Key)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	questionsCount, err := server.store.GetCategoryQuestionsCount(ctx, req.Key)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, questionsCount)
+}
+
+func (server *Server) getCategoriesCount(ctx *gin.Context) {
+	categoriesCount, err := server.store.GetCategoriesCount(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, categoriesCount)
 }

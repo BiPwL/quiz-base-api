@@ -3,9 +3,12 @@ package db
 import (
 	"context"
 	"database/sql"
-	"github.com/BiPwL/quiz-base-api/util"
-	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/BiPwL/quiz-base-api/util"
 )
 
 func createRandomCategory(t *testing.T) Category {
@@ -28,10 +31,17 @@ func createRandomCategory(t *testing.T) Category {
 }
 
 func TestCreateCategory(t *testing.T) {
+	tablesUsed := [1]string{"categories"}
+
 	createRandomCategory(t)
+
+	err := testQueries.CleanTable(context.Background(), tablesUsed[0])
+	require.NoError(t, err)
 }
 
 func TestGetCategory(t *testing.T) {
+	tablesUsed := [1]string{"categories"}
+
 	category1 := createRandomCategory(t)
 	category2, err := testQueries.GetCategory(context.Background(), category1.Key)
 	require.NoError(t, err)
@@ -39,9 +49,14 @@ func TestGetCategory(t *testing.T) {
 
 	require.Equal(t, category1.Key, category2.Key)
 	require.Equal(t, category1.Name, category2.Name)
+
+	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
+	require.NoError(t, err)
 }
 
 func TestUpdateCategory(t *testing.T) {
+	tablesUsed := [1]string{"categories"}
+
 	category1 := createRandomCategory(t)
 
 	arg := UpdateCategoryParams{
@@ -55,9 +70,14 @@ func TestUpdateCategory(t *testing.T) {
 
 	require.Equal(t, category1.Key, category2.Key)
 	require.Equal(t, arg.Name, category2.Name)
+
+	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
+	require.NoError(t, err)
 }
 
 func TestDeleteCategory(t *testing.T) {
+	tablesUsed := [1]string{"categories"}
+
 	category1 := createRandomCategory(t)
 	err := testQueries.DeleteCategory(context.Background(), category1.Key)
 	require.NoError(t, err)
@@ -66,9 +86,14 @@ func TestDeleteCategory(t *testing.T) {
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, category2)
+
+	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
+	require.NoError(t, err)
 }
 
 func TestListCategories(t *testing.T) {
+	tablesUsed := [1]string{"categories"}
+
 	for i := 0; i < 10; i++ {
 		createRandomCategory(t)
 	}
@@ -84,4 +109,94 @@ func TestListCategories(t *testing.T) {
 	for _, category := range categories {
 		require.NotEmpty(t, category)
 	}
+
+	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
+	require.NoError(t, err)
+}
+
+func TestListCategoryQuestions(t *testing.T) {
+	tablesUsed := [2]string{"categories", "questions"}
+
+	category := createRandomCategory(t)
+	expectedQuestions := [2]Question{}
+	var err error
+
+	for i := 0; i < 2; i++ {
+		question := CreateQuestionParams{
+			Text:     util.RandomStr(8),
+			Hint:     util.RandomStr(6),
+			Category: category.Key,
+		}
+		expectedQuestions[i], err = testQueries.CreateQuestion(context.Background(), question)
+		require.NoError(t, err)
+	}
+
+	arg := ListCategoryQuestionsParams{
+		Category: category.Key,
+		Limit:    2,
+		Offset:   0,
+	}
+
+	questions, err := testQueries.ListCategoryQuestions(context.Background(), arg)
+	require.NoError(t, err)
+	require.Len(t, questions, 2)
+
+	for i, question := range questions {
+		require.NotEmpty(t, question)
+		require.Equal(t, expectedQuestions[i].ID, question.ID)
+		require.Equal(t, expectedQuestions[i].Text, question.Text)
+		require.Equal(t, expectedQuestions[i].Hint, question.Hint)
+		require.Equal(t, expectedQuestions[i].Category, question.Category)
+		require.WithinDuration(t, expectedQuestions[i].CreatedAt, question.CreatedAt, time.Second)
+	}
+
+	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
+	require.NoError(t, err)
+	err = testQueries.CleanTable(context.Background(), tablesUsed[1])
+	require.NoError(t, err)
+}
+
+func TestGetCategoryQuestionsCount(t *testing.T) {
+	tablesUsed := [2]string{"categories", "questions"}
+
+	category := createRandomCategory(t)
+
+	for i := 0; i < 3; i++ {
+		question := CreateQuestionParams{
+			Text:     util.RandomStr(8),
+			Hint:     util.RandomStr(6),
+			Category: category.Key,
+		}
+		_, err := testQueries.CreateQuestion(context.Background(), question)
+		require.NoError(t, err)
+	}
+
+	count, err := testQueries.GetCategoryQuestionsCount(context.Background(), category.Key)
+	require.NoError(t, err)
+	require.Equal(t, int64(3), count)
+
+	nonExistentCategory := "non_existent_category"
+	nonExistentCount, err := testQueries.GetCategoryQuestionsCount(context.Background(), nonExistentCategory)
+	require.NoError(t, err)
+	require.Equal(t, int64(0), nonExistentCount)
+
+	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
+	require.NoError(t, err)
+	err = testQueries.CleanTable(context.Background(), tablesUsed[1])
+	require.NoError(t, err)
+}
+
+func TestGetCategoriesCount(t *testing.T) {
+	tablesUsed := [1]string{"categories"}
+
+	for i := 0; i < 5; i++ {
+		createRandomCategory(t)
+	}
+
+	count, err := testQueries.GetCategoriesCount(context.Background())
+	require.NoError(t, err)
+	require.Equal(t, int64(5), count)
+
+	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
+	require.NoError(t, err)
 }
