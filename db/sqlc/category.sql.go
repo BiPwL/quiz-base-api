@@ -7,14 +7,13 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createCategory = `-- name: CreateCategory :one
 INSERT INTO "categories" ("name",
                           "key")
 VALUES ($1, $2)
-RETURNING key, name, created_at
+RETURNING id, key, name, created_at
 `
 
 type CreateCategoryParams struct {
@@ -25,7 +24,12 @@ type CreateCategoryParams struct {
 func (q *Queries) CreateCategory(ctx context.Context, arg CreateCategoryParams) (Category, error) {
 	row := q.db.QueryRowContext(ctx, createCategory, arg.Name, arg.Key)
 	var i Category
-	err := row.Scan(&i.Key, &i.Name, &i.CreatedAt)
+	err := row.Scan(
+		&i.ID,
+		&i.Key,
+		&i.Name,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
@@ -36,22 +40,12 @@ WHERE "key" = $1
 `
 
 func (q *Queries) DeleteCategory(ctx context.Context, key string) error {
-	result, err := q.db.ExecContext(ctx, deleteCategory, key)
-	if err != nil {
-		return err
-	}
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if rowsAffected == 0 {
-		return sql.ErrNoRows
-	}
-	return nil
+	_, err := q.db.ExecContext(ctx, deleteCategory, key)
+	return err
 }
 
 const getCategory = `-- name: GetCategory :one
-SELECT key, name, created_at
+SELECT id, key, name, created_at
 FROM "categories"
 WHERE "key" = $1
 `
@@ -59,7 +53,12 @@ WHERE "key" = $1
 func (q *Queries) GetCategory(ctx context.Context, key string) (Category, error) {
 	row := q.db.QueryRowContext(ctx, getCategory, key)
 	var i Category
-	err := row.Scan(&i.Key, &i.Name, &i.CreatedAt)
+	err := row.Scan(
+		&i.ID,
+		&i.Key,
+		&i.Name,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
@@ -77,7 +76,7 @@ func (q *Queries) GetCategoryQuestionsCount(ctx context.Context, category string
 }
 
 const listCategories = `-- name: ListCategories :many
-SELECT key, name, created_at
+SELECT id, key, name, created_at
 FROM "categories"
 ORDER BY "created_at"
 LIMIT $1 OFFSET $2
@@ -97,7 +96,12 @@ func (q *Queries) ListCategories(ctx context.Context, arg ListCategoriesParams) 
 	items := []Category{}
 	for rows.Next() {
 		var i Category
-		if err := rows.Scan(&i.Key, &i.Name, &i.CreatedAt); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Key,
+			&i.Name,
+			&i.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -158,7 +162,7 @@ const updateCategory = `-- name: UpdateCategory :one
 UPDATE "categories"
 SET "name" = $2
 WHERE "key" = $1
-RETURNING key, name, created_at
+RETURNING id, key, name, created_at
 `
 
 type UpdateCategoryParams struct {
@@ -169,6 +173,11 @@ type UpdateCategoryParams struct {
 func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) (Category, error) {
 	row := q.db.QueryRowContext(ctx, updateCategory, arg.Key, arg.Name)
 	var i Category
-	err := row.Scan(&i.Key, &i.Name, &i.CreatedAt)
+	err := row.Scan(
+		&i.ID,
+		&i.Key,
+		&i.Name,
+		&i.CreatedAt,
+	)
 	return i, err
 }
