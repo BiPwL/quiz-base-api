@@ -37,3 +37,7 @@ LIMIT $2 OFFSET $3;
 SELECT COUNT(*)
 FROM questions
 WHERE category = $1;
+
+-- name: GetCategoriesCount :one
+SELECT COUNT(*)
+FROM categories;
