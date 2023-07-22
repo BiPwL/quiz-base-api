@@ -46,6 +46,8 @@ func NewServer(store *db.Store) *Server {
 	router.GET("answered_questions/:id", server.getAnsweredQuestion)
 	router.GET("answered_questions", server.listAnsweredQuestions)
 	router.DELETE("answered_questions/:id", server.deleteAnsweredQuestion)
+	// dev operations handlers
+	router.DELETE("clean/:name", server.cleanTable)
 
 	server.router = router
 	return server
