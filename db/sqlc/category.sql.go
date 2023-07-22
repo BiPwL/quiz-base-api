@@ -60,6 +60,7 @@ const getCategory = `-- name: GetCategory :one
 SELECT id, key, name, created_at
 FROM "categories"
 WHERE "key" = $1
+LIMIT 1
 `
 
 func (q *Queries) GetCategory(ctx context.Context, key string) (Category, error) {
