@@ -31,6 +31,7 @@ func NewServer(store *db.Store) *Server {
 	router.POST("categories", server.updateCategory)
 	router.GET("categories/questions", server.listCategoryQuestions)
 	router.GET("categories/count/:key", server.getCategoryQuestionsCount)
+	router.GET("categories/count", server.getCategoriesCount)
 	// Question handlers
 	router.POST("questions/new", server.createQuestion)
 	router.GET("questions/:id", server.getQuestion)
