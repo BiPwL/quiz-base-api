@@ -185,3 +185,18 @@ func TestGetCategoryQuestionsCount(t *testing.T) {
 	err = testQueries.CleanTable(context.Background(), tablesUsed[1])
 	require.NoError(t, err)
 }
+
+func TestGetCategoriesCount(t *testing.T) {
+	tablesUsed := [1]string{"categories"}
+
+	for i := 0; i < 5; i++ {
+		createRandomCategory(t)
+	}
+
+	count, err := testQueries.GetCategoriesCount(context.Background())
+	require.NoError(t, err)
+	require.Equal(t, int64(5), count)
+
+	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
+	require.NoError(t, err)
+}
