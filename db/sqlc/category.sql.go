@@ -44,6 +44,18 @@ func (q *Queries) DeleteCategory(ctx context.Context, key string) error {
 	return err
 }
 
+const getCategoriesCount = `-- name: GetCategoriesCount :one
+SELECT COUNT(*)
+FROM categories
+`
+
+func (q *Queries) GetCategoriesCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getCategoriesCount)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getCategory = `-- name: GetCategory :one
 SELECT id, key, name, created_at
 FROM "categories"
