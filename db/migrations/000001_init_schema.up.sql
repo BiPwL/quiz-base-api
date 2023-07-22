@@ -18,9 +18,10 @@ CREATE TABLE "questions"
 
 CREATE TABLE "categories"
 (
-    "key"        varchar UNIQUE NOT NULL,
-    "name"       varchar UNIQUE NOT NULL,
-    "created_at" TIMESTAMP      NOT NULL DEFAULT (now())
+    "id"         BIGSERIAL PRIMARY KEY NOT NULL,
+    "key"        varchar UNIQUE        NOT NULL,
+    "name"       varchar UNIQUE        NOT NULL,
+    "created_at" TIMESTAMP             NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "answered_questions"
