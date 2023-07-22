@@ -97,13 +97,19 @@ func (server *Server) deleteCategory(ctx *gin.Context) {
 		return
 	}
 
-	err := server.store.DeleteCategory(ctx, req.Key)
+	_, err := server.store.GetCategory(ctx, req.Key)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
 
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	err = server.store.DeleteCategory(ctx, req.Key)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
