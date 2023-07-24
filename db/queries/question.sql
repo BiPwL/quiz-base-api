@@ -24,8 +24,23 @@ SET "text" = $2,
 WHERE "id" = $1
 RETURNING *;
 
-
 -- name: DeleteQuestion :exec
 DELETE
 FROM "questions"
 WHERE "id" = $1;
+
+-- name: ListQuestionAnswers :many
+SELECT *
+FROM "answers"
+WHERE "question_id" = $1
+ORDER BY "created_at"
+LIMIT $2 OFFSET $3;
+
+-- name: GetQuestionAnswersCount :one
+SELECT COUNT(*)
+FROM "answers"
+WHERE "question_id" = $1;
+
+-- name: GetQuestionsCount :one
+SELECT COUNT(*)
+FROM "questions";
