@@ -34,10 +34,17 @@ func createRandomQuestion(t *testing.T) Question {
 }
 
 func TestCreateQuestion(t *testing.T) {
+	tablesUsed := [1]string{"questions"}
+
 	createRandomQuestion(t)
+
+	err := testQueries.CleanTable(context.Background(), tablesUsed[0])
+	require.NoError(t, err)
 }
 
 func TestGetQuestion(t *testing.T) {
+	tablesUsed := [1]string{"questions"}
+
 	question1 := createRandomQuestion(t)
 	question2, err := testQueries.GetQuestion(context.Background(), question1.ID)
 	require.NoError(t, err)
@@ -47,9 +54,14 @@ func TestGetQuestion(t *testing.T) {
 	require.Equal(t, question1.Text, question2.Text)
 	require.Equal(t, question1.Hint, question2.Hint)
 	require.Equal(t, question1.Category, question2.Category)
+
+	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
+	require.NoError(t, err)
 }
 
 func TestUpdateQuestion(t *testing.T) {
+	tablesUsed := [1]string{"questions"}
+
 	question1 := createRandomQuestion(t)
 
 	arg := UpdateQuestionParams{
@@ -65,9 +77,14 @@ func TestUpdateQuestion(t *testing.T) {
 	require.Equal(t, question1.ID, question2.ID)
 	require.Equal(t, arg.Text, question2.Text)
 	require.Equal(t, arg.Hint, question2.Hint)
+
+	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
+	require.NoError(t, err)
 }
 
 func TestDeleteQuestion(t *testing.T) {
+	tablesUsed := [1]string{"questions"}
+
 	question1 := createRandomQuestion(t)
 	err := testQueries.DeleteQuestion(context.Background(), question1.ID)
 	require.NoError(t, err)
@@ -76,9 +93,14 @@ func TestDeleteQuestion(t *testing.T) {
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, question2)
+
+	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
+	require.NoError(t, err)
 }
 
 func TestListQuestion(t *testing.T) {
+	tablesUsed := [1]string{"questions"}
+
 	for i := 0; i < 10; i++ {
 		createRandomQuestion(t)
 	}
@@ -94,4 +116,7 @@ func TestListQuestion(t *testing.T) {
 	for _, question := range questions {
 		require.NotEmpty(t, question)
 	}
+
+	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
+	require.NoError(t, err)
 }
