@@ -38,6 +38,7 @@ func NewServer(store *db.Store) *Server {
 	router.GET("questions", server.listQuestions)
 	router.DELETE("questions/:id", server.deleteQuestion)
 	router.POST("questions", server.updateQuestion)
+	router.GET("questions/answers", server.listQuestionAnswers)
 	// Answer handlers
 	router.POST("answers/new", server.createAnswer)
 	router.GET("answers/:id", server.getAnswer)
