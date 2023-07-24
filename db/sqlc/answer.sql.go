@@ -122,7 +122,7 @@ func (q *Queries) ListAnswers(ctx context.Context, arg ListAnswersParams) ([]Ans
 
 const updateAnswer = `-- name: UpdateAnswer :one
 UPDATE "answers"
-SET "text" = $2,
+SET "text"       = $2,
     "is_correct" = $3
 WHERE "id" = $1
 RETURNING id, question_id, text, is_correct, created_at
