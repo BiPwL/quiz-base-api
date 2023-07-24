@@ -193,3 +193,18 @@ func TestGetQuestionAnswersCount(t *testing.T) {
 	err = testQueries.CleanTable(context.Background(), tablesUsed[1])
 	require.NoError(t, err)
 }
+
+func TestGetQuestionsCount(t *testing.T) {
+	tablesUsed := [1]string{"questions"}
+
+	for i := 0; i < 5; i++ {
+		createRandomQuestion(t)
+	}
+
+	count, err := testQueries.GetQuestionsCount(context.Background())
+	require.NoError(t, err)
+	require.Equal(t, int64(5), count)
+
+	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
+	require.NoError(t, err)
+}
