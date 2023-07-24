@@ -26,3 +26,7 @@ RETURNING *;
 DELETE
 FROM "users"
 WHERE "id" = $1;
+
+-- name: GetUsersCount :one
+SELECT COUNT(*)
+FROM "users";
