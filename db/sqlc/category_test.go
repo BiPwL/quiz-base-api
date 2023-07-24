@@ -115,7 +115,7 @@ func TestListCategories(t *testing.T) {
 }
 
 func TestListCategoryQuestions(t *testing.T) {
-	tablesUsed := [2]string{"categories", "questions"}
+	tablesUsed := [2]string{"questions", "categories"}
 
 	category := createRandomCategory(t)
 	expectedQuestions := [2]Question{}
@@ -150,14 +150,14 @@ func TestListCategoryQuestions(t *testing.T) {
 		require.WithinDuration(t, expectedQuestions[i].CreatedAt, question.CreatedAt, time.Second)
 	}
 
-	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
-	require.NoError(t, err)
-	err = testQueries.CleanTable(context.Background(), tablesUsed[1])
-	require.NoError(t, err)
+	for _, table := range tablesUsed {
+		err = testQueries.CleanTable(context.Background(), table)
+		require.NoError(t, err)
+	}
 }
 
 func TestGetCategoryQuestionsCount(t *testing.T) {
-	tablesUsed := [2]string{"categories", "questions"}
+	tablesUsed := [2]string{"questions", "categories"}
 
 	category := createRandomCategory(t)
 
@@ -180,10 +180,10 @@ func TestGetCategoryQuestionsCount(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, int64(0), nonExistentCount)
 
-	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
-	require.NoError(t, err)
-	err = testQueries.CleanTable(context.Background(), tablesUsed[1])
-	require.NoError(t, err)
+	for _, table := range tablesUsed {
+		err = testQueries.CleanTable(context.Background(), table)
+		require.NoError(t, err)
+	}
 }
 
 func TestGetCategoriesCount(t *testing.T) {
