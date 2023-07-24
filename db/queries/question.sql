@@ -41,3 +41,7 @@ LIMIT $2 OFFSET $3;
 SELECT COUNT(*)
 FROM "answers"
 WHERE "question_id" = $1;
+
+-- name: GetQuestionsCount :one
+SELECT COUNT(*)
+FROM "questions";
