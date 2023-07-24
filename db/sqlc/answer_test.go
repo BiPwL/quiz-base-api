@@ -91,3 +91,20 @@ func TestListAnswers(t *testing.T) {
 		require.NotEmpty(t, answer)
 	}
 }
+
+func TestGetAnswersCount(t *testing.T) {
+	tablesUsed := [3]string{"answers", "questions", "categories"}
+
+	for i := 0; i < 5; i++ {
+		createRandomAnswer(t)
+	}
+
+	count, err := testQueries.GetAnswersCount(context.Background())
+	require.NoError(t, err)
+	require.Equal(t, int64(5), count)
+
+	for _, table := range tablesUsed {
+		err = testQueries.CleanTable(context.Background(), table)
+		require.NoError(t, err)
+	}
+}
