@@ -207,11 +207,11 @@ func (server *Server) getQuestionAnswersCount(ctx *gin.Context) {
 }
 
 func (server *Server) getQuestionsCount(ctx *gin.Context) {
-	categoriesCount, err := server.store.GetQuestionsCount(ctx)
+	count, err := server.store.GetQuestionsCount(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, categoriesCount)
+	ctx.JSON(http.StatusOK, count)
 }
