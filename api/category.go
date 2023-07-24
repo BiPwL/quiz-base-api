@@ -193,21 +193,21 @@ func (server *Server) getCategoryQuestionsCount(ctx *gin.Context) {
 		return
 	}
 
-	questionsCount, err := server.store.GetCategoryQuestionsCount(ctx, req.Key)
+	count, err := server.store.GetCategoryQuestionsCount(ctx, req.Key)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, questionsCount)
+	ctx.JSON(http.StatusOK, count)
 }
 
 func (server *Server) getCategoriesCount(ctx *gin.Context) {
-	categoriesCount, err := server.store.GetCategoriesCount(ctx)
+	count, err := server.store.GetCategoriesCount(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, categoriesCount)
+	ctx.JSON(http.StatusOK, count)
 }
