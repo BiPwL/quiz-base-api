@@ -19,13 +19,16 @@ LIMIT $1 OFFSET $2;
 
 -- name: UpdateAnswer :one
 UPDATE "answers"
-SET "text" = $2,
+SET "text"       = $2,
     "is_correct" = $3
 WHERE "id" = $1
 RETURNING *;
-
 
 -- name: DeleteAnswer :exec
 DELETE
 FROM "answers"
 WHERE "id" = $1;
+
+-- name: GetAnswersCount :one
+SELECT COUNT(*)
+FROM "answers";

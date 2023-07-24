@@ -154,3 +154,13 @@ func (server *Server) updateAnswer(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, answer)
 }
+
+func (server *Server) getAnswersCount(ctx *gin.Context) {
+	count, err := server.store.GetAnswersCount(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, count)
+}
