@@ -120,3 +120,45 @@ func TestListQuestion(t *testing.T) {
 	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
 	require.NoError(t, err)
 }
+
+func TestListQuestionAnswers(t *testing.T) {
+	tablesUsed := [2]string{"questions", "answers"}
+
+	question := createRandomQuestion(t)
+	expectedAnswers := [2]Answer{}
+	var err error
+
+	for i := 0; i < 2; i++ {
+		answer := CreateAnswerParams{
+			QuestionID: question.ID,
+			Text:       util.RandomStr(8),
+			IsCorrect:  util.RandomBool(),
+		}
+		expectedAnswers[i], err = testQueries.CreateAnswer(context.Background(), answer)
+		require.NoError(t, err)
+	}
+
+	arg := ListQuestionAnswersParams{
+		QuestionID: question.ID,
+		Limit:      2,
+		Offset:     0,
+	}
+
+	answers, err := testQueries.ListQuestionAnswers(context.Background(), arg)
+	require.NoError(t, err)
+	require.Len(t, answers, 2)
+
+	for i, answer := range answers {
+		require.NotEmpty(t, question)
+		require.Equal(t, expectedAnswers[i].ID, answer.ID)
+		require.Equal(t, expectedAnswers[i].QuestionID, answer.QuestionID)
+		require.Equal(t, expectedAnswers[i].Text, answer.Text)
+		require.Equal(t, expectedAnswers[i].IsCorrect, answer.IsCorrect)
+		require.WithinDuration(t, expectedAnswers[i].CreatedAt, answer.CreatedAt, time.Second)
+	}
+
+	err = testQueries.CleanTable(context.Background(), tablesUsed[0])
+	require.NoError(t, err)
+	err = testQueries.CleanTable(context.Background(), tablesUsed[1])
+	require.NoError(t, err)
+}
