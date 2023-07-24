@@ -80,6 +80,18 @@ func (q *Queries) GetQuestionAnswersCount(ctx context.Context, questionID int64)
 	return count, err
 }
 
+const getQuestionsCount = `-- name: GetQuestionsCount :one
+SELECT COUNT(*)
+FROM "questions"
+`
+
+func (q *Queries) GetQuestionsCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getQuestionsCount)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const listQuestionAnswers = `-- name: ListQuestionAnswers :many
 SELECT id, question_id, text, is_correct, created_at
 FROM "answers"
