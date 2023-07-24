@@ -67,6 +67,49 @@ func (q *Queries) GetQuestion(ctx context.Context, id int64) (Question, error) {
 	return i, err
 }
 
+const listQuestionAnswers = `-- name: ListQuestionAnswers :many
+SELECT id, question_id, text, is_correct, created_at
+FROM "answers"
+WHERE "question_id" = $1
+ORDER BY "created_at"
+LIMIT $2 OFFSET $3
+`
+
+type ListQuestionAnswersParams struct {
+	QuestionID int64 `json:"question_id"`
+	Limit      int32 `json:"limit"`
+	Offset     int32 `json:"offset"`
+}
+
+func (q *Queries) ListQuestionAnswers(ctx context.Context, arg ListQuestionAnswersParams) ([]Answer, error) {
+	rows, err := q.db.QueryContext(ctx, listQuestionAnswers, arg.QuestionID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Answer{}
+	for rows.Next() {
+		var i Answer
+		if err := rows.Scan(
+			&i.ID,
+			&i.QuestionID,
+			&i.Text,
+			&i.IsCorrect,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listQuestions = `-- name: ListQuestions :many
 SELECT id, text, hint, category, created_at
 FROM "questions"
