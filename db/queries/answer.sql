@@ -28,3 +28,7 @@ RETURNING *;
 DELETE
 FROM "answers"
 WHERE "id" = $1;
+
+-- name: GetAnswersCount :one
+SELECT COUNT(*)
+FROM "answers";
