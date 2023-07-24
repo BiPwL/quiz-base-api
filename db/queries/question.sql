@@ -24,7 +24,6 @@ SET "text" = $2,
 WHERE "id" = $1
 RETURNING *;
 
-
 -- name: DeleteQuestion :exec
 DELETE
 FROM "questions"
