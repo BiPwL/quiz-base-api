@@ -29,3 +29,10 @@ RETURNING *;
 DELETE
 FROM "questions"
 WHERE "id" = $1;
+
+-- name: ListQuestionAnswers :many
+SELECT *
+FROM "answers"
+WHERE "question_id" = $1
+ORDER BY "created_at"
+LIMIT $2 OFFSET $3;
