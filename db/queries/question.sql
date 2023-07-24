@@ -36,3 +36,8 @@ FROM "answers"
 WHERE "question_id" = $1
 ORDER BY "created_at"
 LIMIT $2 OFFSET $3;
+
+-- name: GetQuestionAnswersCount :one
+SELECT COUNT(*)
+FROM "answers"
+WHERE "question_id" = $1;
