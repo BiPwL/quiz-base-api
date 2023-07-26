@@ -6,8 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/BiPwL/quiz-base-api/util"
 	"github.com/stretchr/testify/require"
+
+	"github.com/BiPwL/quiz-base-api/util"
 )
 
 func createRandomUser(t *testing.T) User {
@@ -30,10 +31,19 @@ func createRandomUser(t *testing.T) User {
 }
 
 func TestCreateUser(t *testing.T) {
+	tablesUsed := [1]string{"users"}
+
 	createRandomUser(t)
+
+	for _, table := range tablesUsed {
+		err := testQueries.CleanTable(context.Background(), table)
+		require.NoError(t, err)
+	}
 }
 
 func TestGetUser(t *testing.T) {
+	tablesUsed := [1]string{"users"}
+
 	user1 := createRandomUser(t)
 	user2, err := testQueries.GetUser(context.Background(), user1.ID)
 	require.NoError(t, err)
@@ -43,9 +53,16 @@ func TestGetUser(t *testing.T) {
 	require.Equal(t, user1.Email, user2.Email)
 	require.Equal(t, user1.Password, user2.Password)
 	require.WithinDuration(t, user1.CreatedAt, user2.CreatedAt, time.Second)
+
+	for _, table := range tablesUsed {
+		err = testQueries.CleanTable(context.Background(), table)
+		require.NoError(t, err)
+	}
 }
 
 func TestUpdateUser(t *testing.T) {
+	tablesUsed := [1]string{"users"}
+
 	user1 := createRandomUser(t)
 
 	arg := UpdateUserParams{
@@ -61,9 +78,16 @@ func TestUpdateUser(t *testing.T) {
 	require.Equal(t, user1.Email, user2.Email)
 	require.Equal(t, arg.Password, user2.Password)
 	require.WithinDuration(t, user1.CreatedAt, user2.CreatedAt, time.Second)
+
+	for _, table := range tablesUsed {
+		err = testQueries.CleanTable(context.Background(), table)
+		require.NoError(t, err)
+	}
 }
 
 func TestDeleteUser(t *testing.T) {
+	tablesUsed := [1]string{"users"}
+
 	user1 := createRandomUser(t)
 	err := testQueries.DeleteUser(context.Background(), user1.ID)
 	require.NoError(t, err)
@@ -72,9 +96,16 @@ func TestDeleteUser(t *testing.T) {
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, user2)
+
+	for _, table := range tablesUsed {
+		err = testQueries.CleanTable(context.Background(), table)
+		require.NoError(t, err)
+	}
 }
 
 func TestListUsers(t *testing.T) {
+	tablesUsed := [1]string{"users"}
+
 	for i := 0; i < 10; i++ {
 		createRandomUser(t)
 	}
@@ -89,6 +120,11 @@ func TestListUsers(t *testing.T) {
 
 	for _, user := range users {
 		require.NotEmpty(t, user)
+	}
+
+	for _, table := range tablesUsed {
+		err = testQueries.CleanTable(context.Background(), table)
+		require.NoError(t, err)
 	}
 }
 
