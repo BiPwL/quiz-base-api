@@ -91,3 +91,20 @@ func TestListUsers(t *testing.T) {
 		require.NotEmpty(t, user)
 	}
 }
+
+func TestGetUsersCount(t *testing.T) {
+	tablesUsed := [1]string{"users"}
+
+	for i := 0; i < 5; i++ {
+		createRandomUser(t)
+	}
+
+	count, err := testQueries.GetUsersCount(context.Background())
+	require.NoError(t, err)
+	require.Equal(t, int64(5), count)
+
+	for _, table := range tablesUsed {
+		err = testQueries.CleanTable(context.Background(), table)
+		require.NoError(t, err)
+	}
+}
