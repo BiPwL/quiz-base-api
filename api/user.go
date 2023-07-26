@@ -136,3 +136,13 @@ func (server *Server) updateUser(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, user)
 }
+
+func (server *Server) getUsersCount(ctx *gin.Context) {
+	count, err := server.store.GetUsersCount(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, count)
+}
