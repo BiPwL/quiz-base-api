@@ -63,6 +63,26 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 	return i, err
 }
 
+const getUserAnsweredQuestionsCount = `-- name: GetUserAnsweredQuestionsCount :one
+SELECT COUNT(*)
+FROM "answered_questions" AS aq
+         JOIN "questions" AS q ON aq.question_id = q.id
+WHERE aq.user_id = $1
+  AND ($2::TEXT = '' OR q.category = $2::TEXT)
+`
+
+type GetUserAnsweredQuestionsCountParams struct {
+	UserID   int64  `json:"user_id"`
+	Category string `json:"category"`
+}
+
+func (q *Queries) GetUserAnsweredQuestionsCount(ctx context.Context, arg GetUserAnsweredQuestionsCountParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getUserAnsweredQuestionsCount, arg.UserID, arg.Category)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getUsersCount = `-- name: GetUsersCount :one
 SELECT COUNT(*)
 FROM "users"
