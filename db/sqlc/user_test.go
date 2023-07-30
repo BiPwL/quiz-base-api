@@ -37,7 +37,7 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestGetUser(t *testing.T) {
-	tablesUsed := [1]string{"users"}
+	defer testQueries.CleanTables(context.Background(), []string{"users"})
 
 	user1 := createRandomUser(t)
 	user2, err := testQueries.GetUser(context.Background(), user1.ID)
@@ -48,11 +48,6 @@ func TestGetUser(t *testing.T) {
 	require.Equal(t, user1.Email, user2.Email)
 	require.Equal(t, user1.Password, user2.Password)
 	require.WithinDuration(t, user1.CreatedAt, user2.CreatedAt, time.Second)
-
-	for _, table := range tablesUsed {
-		err = testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
 
 func TestUpdateUser(t *testing.T) {
