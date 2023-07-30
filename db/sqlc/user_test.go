@@ -71,7 +71,7 @@ func TestUpdateUser(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
-	tablesUsed := [1]string{"users"}
+	defer testQueries.CleanTables(context.Background(), []string{"users"})
 
 	user1 := createRandomUser(t)
 	err := testQueries.DeleteUser(context.Background(), user1.ID)
@@ -81,11 +81,6 @@ func TestDeleteUser(t *testing.T) {
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, user2)
-
-	for _, table := range tablesUsed {
-		err = testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
 
 func TestListUsers(t *testing.T) {
