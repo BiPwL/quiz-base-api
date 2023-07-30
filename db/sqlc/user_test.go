@@ -134,13 +134,15 @@ func TestListUsers(t *testing.T) {
 func TestGetUsersCount(t *testing.T) {
 	defer testQueries.CleanTables(context.Background(), []string{"users"})
 
-	for i := 0; i < 5; i++ {
+	const numQuestions = 10
+
+	for i := 0; i < numQuestions; i++ {
 		createRandomUser(t)
 	}
 
 	count, err := testQueries.GetUsersCount(context.Background())
 	require.NoError(t, err)
-	require.Equal(t, int64(5), count)
+	require.Equal(t, int64(numQuestions), count)
 }
 
 func TestListUserAnsweredQuestions(t *testing.T) {
