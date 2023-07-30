@@ -36,7 +36,7 @@ func innerTestListUserAnsweredQuestions(t *testing.T, numQuestions int, userID i
 	var err error
 
 	arg := ListUserAnsweredQuestionsParams{
-		Limit:    5,
+		Limit:    int32(numQuestions),
 		Offset:   0,
 		UserID:   userID,
 		Category: categoryKey,
