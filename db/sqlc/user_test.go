@@ -31,14 +31,9 @@ func createRandomUser(t *testing.T) User {
 }
 
 func TestCreateUser(t *testing.T) {
-	tablesUsed := [1]string{"users"}
+	defer testQueries.CleanTables(context.Background(), []string{"users"})
 
 	createRandomUser(t)
-
-	for _, table := range tablesUsed {
-		err := testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
 
 func TestGetUser(t *testing.T) {
