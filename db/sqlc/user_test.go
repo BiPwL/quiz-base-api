@@ -144,3 +144,55 @@ func TestGetUsersCount(t *testing.T) {
 		require.NoError(t, err)
 	}
 }
+
+func TestListUserAnsweredQuestionsWithCategory(t *testing.T) {
+	tablesUsed := [4]string{"users", "categories", "questions", "answered_questions"}
+
+	user := createRandomUser(t)
+	category := createRandomCategory(t)
+	const numQuestions = 5
+	expectedQuestions := [numQuestions]Question{}
+	var err error
+
+	for i := 0; i < numQuestions; i++ {
+		argQuestion := CreateQuestionParams{
+			Text:     util.RandomStr(10),
+			Hint:     util.RandomStr(8),
+			Category: category.Key,
+		}
+		expectedQuestions[i], err = testQueries.CreateQuestion(context.Background(), argQuestion)
+		require.NoError(t, err)
+
+		argAnsweredQuestion := CreateAnsweredQuestionParams{
+			UserID:     user.ID,
+			QuestionID: expectedQuestions[i].ID,
+		}
+		_, err = testQueries.CreateAnsweredQuestion(context.Background(), argAnsweredQuestion)
+		require.NoError(t, err)
+	}
+
+	arg := ListUserAnsweredQuestionsParams{
+		Limit:    5,
+		Offset:   0,
+		UserID:   user.ID,
+		Category: category.Key,
+	}
+
+	answeredQuestions, err := testQueries.ListUserAnsweredQuestions(context.Background(), arg)
+	require.NoError(t, err)
+	require.Len(t, answeredQuestions, numQuestions)
+
+	for i, answeredQuestion := range answeredQuestions {
+		require.NotEmpty(t, answeredQuestion)
+		require.Equal(t, expectedQuestions[i].ID, answeredQuestion.ID)
+		require.Equal(t, expectedQuestions[i].Text, answeredQuestion.Text)
+		require.Equal(t, expectedQuestions[i].Hint, answeredQuestion.Hint)
+		require.Equal(t, expectedQuestions[i].Category, answeredQuestion.Category)
+		require.WithinDuration(t, expectedQuestions[i].CreatedAt, answeredQuestion.CreatedAt, time.Second)
+	}
+
+	for _, table := range tablesUsed {
+		err = testQueries.CleanTable(context.Background(), table)
+		require.NoError(t, err)
+	}
+}
