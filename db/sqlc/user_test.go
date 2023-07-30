@@ -104,7 +104,7 @@ func TestListUsers(t *testing.T) {
 }
 
 func TestGetUsersCount(t *testing.T) {
-	tablesUsed := [1]string{"users"}
+	defer testQueries.CleanTables(context.Background(), []string{"users"})
 
 	for i := 0; i < 5; i++ {
 		createRandomUser(t)
@@ -113,11 +113,6 @@ func TestGetUsersCount(t *testing.T) {
 	count, err := testQueries.GetUsersCount(context.Background())
 	require.NoError(t, err)
 	require.Equal(t, int64(5), count)
-
-	for _, table := range tablesUsed {
-		err = testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
 
 func TestListUserAnsweredQuestionsWithCategory(t *testing.T) {
