@@ -26,3 +26,13 @@ func (q *Queries) CleanTable(ctx context.Context, tableName string) error {
 	_, err := q.db.ExecContext(ctx, fmt.Sprintf(cleanTable, tableName, tableName))
 	return err
 }
+
+func (q *Queries) CleanTables(ctx context.Context, tablesNames []string) []error {
+	var errors []error
+	for _, table := range tablesNames {
+		if err := q.CleanTable(ctx, table); err != nil {
+			errors = append(errors, fmt.Errorf("failed to clean table %s: %w", table, err))
+		}
+	}
+	return errors
+}
