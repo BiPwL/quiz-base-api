@@ -75,6 +75,56 @@ func (q *Queries) GetUsersCount(ctx context.Context) (int64, error) {
 	return count, err
 }
 
+const listUserAnsweredQuestions = `-- name: ListUserAnsweredQuestions :many
+SELECT q.id, q.text, q.hint, q.category, q.created_at
+FROM "answered_questions" AS aq
+         JOIN "questions" AS q ON aq.question_id = q.id
+WHERE aq.user_id = $3
+  AND ($4::TEXT = '' OR q.category = $4::TEXT)
+LIMIT $1 OFFSET $2
+`
+
+type ListUserAnsweredQuestionsParams struct {
+	Limit    int32  `json:"limit"`
+	Offset   int32  `json:"offset"`
+	UserID   int64  `json:"user_id"`
+	Category string `json:"category"`
+}
+
+func (q *Queries) ListUserAnsweredQuestions(ctx context.Context, arg ListUserAnsweredQuestionsParams) ([]Question, error) {
+	rows, err := q.db.QueryContext(ctx, listUserAnsweredQuestions,
+		arg.Limit,
+		arg.Offset,
+		arg.UserID,
+		arg.Category,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Question{}
+	for rows.Next() {
+		var i Question
+		if err := rows.Scan(
+			&i.ID,
+			&i.Text,
+			&i.Hint,
+			&i.Category,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listUsers = `-- name: ListUsers :many
 SELECT id, email, password, created_at
 FROM "users"
