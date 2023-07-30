@@ -30,6 +30,32 @@ func createRandomUser(t *testing.T) User {
 	return user
 }
 
+func innerTestListUserAnsweredQuestions(t *testing.T, numQuestions int, userID int64, categoryKey string, expectedQuestions []Question) {
+	defer testQueries.CleanTables(context.Background(), []string{"categories", "questions", "answered_questions"})
+
+	var err error
+
+	arg := ListUserAnsweredQuestionsParams{
+		Limit:    5,
+		Offset:   0,
+		UserID:   userID,
+		Category: categoryKey,
+	}
+
+	answeredQuestions, err := testQueries.ListUserAnsweredQuestions(context.Background(), arg)
+	require.NoError(t, err)
+	require.Len(t, answeredQuestions, numQuestions)
+
+	for i, answeredQuestion := range answeredQuestions {
+		require.NotEmpty(t, answeredQuestion)
+		require.Equal(t, expectedQuestions[i].ID, answeredQuestion.ID)
+		require.Equal(t, expectedQuestions[i].Text, answeredQuestion.Text)
+		require.Equal(t, expectedQuestions[i].Hint, answeredQuestion.Hint)
+		require.Equal(t, expectedQuestions[i].Category, answeredQuestion.Category)
+		require.WithinDuration(t, expectedQuestions[i].CreatedAt, answeredQuestion.CreatedAt, time.Second)
+	}
+}
+
 func TestCreateUser(t *testing.T) {
 	defer testQueries.CleanTables(context.Background(), []string{"users"})
 
