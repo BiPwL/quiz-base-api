@@ -196,3 +196,46 @@ func TestListUserAnsweredQuestionsWithCategory(t *testing.T) {
 		require.NoError(t, err)
 	}
 }
+
+func TestListUserAnsweredQuestionsWithoutCategory(t *testing.T) {
+	tablesUsed := [4]string{"users", "categories", "questions", "answered_questions"}
+
+	user := createRandomUser(t)
+	const numQuestions = 5
+	expectedQuestions := [numQuestions]Question{}
+	var err error
+
+	for i := 0; i < numQuestions; i++ {
+		expectedQuestions[i] = createRandomQuestion(t)
+		argAnsweredQuestion := CreateAnsweredQuestionParams{
+			UserID:     user.ID,
+			QuestionID: expectedQuestions[i].ID,
+		}
+		_, err = testQueries.CreateAnsweredQuestion(context.Background(), argAnsweredQuestion)
+		require.NoError(t, err)
+	}
+
+	arg := ListUserAnsweredQuestionsParams{
+		Limit:  5,
+		Offset: 0,
+		UserID: user.ID,
+	}
+
+	answeredQuestions, err := testQueries.ListUserAnsweredQuestions(context.Background(), arg)
+	require.NoError(t, err)
+	require.Len(t, answeredQuestions, numQuestions)
+
+	for i, answeredQuestion := range answeredQuestions {
+		require.NotEmpty(t, answeredQuestion)
+		require.Equal(t, expectedQuestions[i].ID, answeredQuestion.ID)
+		require.Equal(t, expectedQuestions[i].Text, answeredQuestion.Text)
+		require.Equal(t, expectedQuestions[i].Hint, answeredQuestion.Hint)
+		require.Equal(t, expectedQuestions[i].Category, answeredQuestion.Category)
+		require.WithinDuration(t, expectedQuestions[i].CreatedAt, answeredQuestion.CreatedAt, time.Second)
+	}
+
+	for _, table := range tablesUsed {
+		err = testQueries.CleanTable(context.Background(), table)
+		require.NoError(t, err)
+	}
+}
