@@ -107,17 +107,19 @@ func TestDeleteAnswer(t *testing.T) {
 func TestListAnswers(t *testing.T) {
 	tablesUsed := [3]string{"answers", "questions", "categories"}
 
-	for i := 0; i < 10; i++ {
+	const numQuestions = 10
+
+	for i := 0; i < numQuestions; i++ {
 		createRandomAnswer(t)
 	}
 	arg := ListAnswersParams{
-		Limit:  5,
-		Offset: 5,
+		Limit:  numQuestions,
+		Offset: 0,
 	}
 
 	answers, err := testQueries.ListAnswers(context.Background(), arg)
 	require.NoError(t, err)
-	require.Len(t, answers, 5)
+	require.Len(t, answers, numQuestions)
 
 	for _, answer := range answers {
 		require.NotEmpty(t, answer)
