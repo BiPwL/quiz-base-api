@@ -35,18 +35,13 @@ func createRandomQuestion(t *testing.T) Question {
 }
 
 func TestCreateQuestion(t *testing.T) {
-	tablesUsed := [2]string{"questions", "categories"}
+	defer testQueries.CleanTables(context.Background(), []string{"questions", "categories"})
 
 	createRandomQuestion(t)
-
-	for _, table := range tablesUsed {
-		err := testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
 
 func TestGetQuestion(t *testing.T) {
-	tablesUsed := [2]string{"questions", "categories"}
+	defer testQueries.CleanTables(context.Background(), []string{"questions", "categories"})
 
 	question1 := createRandomQuestion(t)
 	question2, err := testQueries.GetQuestion(context.Background(), question1.ID)
@@ -57,15 +52,10 @@ func TestGetQuestion(t *testing.T) {
 	require.Equal(t, question1.Text, question2.Text)
 	require.Equal(t, question1.Hint, question2.Hint)
 	require.Equal(t, question1.Category, question2.Category)
-
-	for _, table := range tablesUsed {
-		err = testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
 
 func TestUpdateQuestion(t *testing.T) {
-	tablesUsed := [2]string{"questions", "categories"}
+	defer testQueries.CleanTables(context.Background(), []string{"questions", "categories"})
 
 	question1 := createRandomQuestion(t)
 
@@ -82,15 +72,10 @@ func TestUpdateQuestion(t *testing.T) {
 	require.Equal(t, question1.ID, question2.ID)
 	require.Equal(t, arg.Text, question2.Text)
 	require.Equal(t, arg.Hint, question2.Hint)
-
-	for _, table := range tablesUsed {
-		err = testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
 
 func TestDeleteQuestion(t *testing.T) {
-	tablesUsed := [2]string{"questions", "categories"}
+	defer testQueries.CleanTables(context.Background(), []string{"questions", "categories"})
 
 	question1 := createRandomQuestion(t)
 	err := testQueries.DeleteQuestion(context.Background(), question1.ID)
@@ -100,46 +85,39 @@ func TestDeleteQuestion(t *testing.T) {
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, question2)
-
-	for _, table := range tablesUsed {
-		err = testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
 
 func TestListQuestion(t *testing.T) {
-	tablesUsed := [2]string{"questions", "categories"}
+	defer testQueries.CleanTables(context.Background(), []string{"questions", "categories"})
 
-	for i := 0; i < 10; i++ {
+	const numQuestions = 10
+
+	for i := 0; i < numQuestions; i++ {
 		createRandomQuestion(t)
 	}
 	arg := ListQuestionsParams{
-		Limit:  5,
-		Offset: 5,
+		Limit:  numQuestions,
+		Offset: 0,
 	}
 
 	questions, err := testQueries.ListQuestions(context.Background(), arg)
 	require.NoError(t, err)
-	require.Len(t, questions, 5)
+	require.Len(t, questions, numQuestions)
 
 	for _, question := range questions {
 		require.NotEmpty(t, question)
 	}
-
-	for _, table := range tablesUsed {
-		err = testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
 
 func TestListQuestionAnswers(t *testing.T) {
-	tablesUsed := [3]string{"answers", "questions", "categories"}
+	defer testQueries.CleanTables(context.Background(), []string{"answers", "questions", "categories"})
 
+	const numQuestions = 10
 	question := createRandomQuestion(t)
-	expectedAnswers := [2]Answer{}
+	expectedAnswers := [numQuestions]Answer{}
 	var err error
 
-	for i := 0; i < 2; i++ {
+	for i := 0; i < numQuestions; i++ {
 		answer := CreateAnswerParams{
 			QuestionID: question.ID,
 			Text:       util.RandomStr(8),
@@ -151,13 +129,13 @@ func TestListQuestionAnswers(t *testing.T) {
 
 	arg := ListQuestionAnswersParams{
 		QuestionID: question.ID,
-		Limit:      2,
+		Limit:      numQuestions,
 		Offset:     0,
 	}
 
 	answers, err := testQueries.ListQuestionAnswers(context.Background(), arg)
 	require.NoError(t, err)
-	require.Len(t, answers, 2)
+	require.Len(t, answers, numQuestions)
 
 	for i, answer := range answers {
 		require.NotEmpty(t, question)
@@ -167,19 +145,15 @@ func TestListQuestionAnswers(t *testing.T) {
 		require.Equal(t, expectedAnswers[i].IsCorrect, answer.IsCorrect)
 		require.WithinDuration(t, expectedAnswers[i].CreatedAt, answer.CreatedAt, time.Second)
 	}
-
-	for _, table := range tablesUsed {
-		err = testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
 
 func TestGetQuestionAnswersCount(t *testing.T) {
-	tablesUsed := [3]string{"answers", "questions", "categories"}
+	defer testQueries.CleanTables(context.Background(), []string{"answers", "questions", "categories"})
 
+	const numQuestions = 10
 	question := createRandomQuestion(t)
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < numQuestions; i++ {
 		answer := CreateAnswerParams{
 			QuestionID: question.ID,
 			Text:       util.RandomStr(8),
@@ -191,32 +165,24 @@ func TestGetQuestionAnswersCount(t *testing.T) {
 
 	count, err := testQueries.GetQuestionAnswersCount(context.Background(), question.ID)
 	require.NoError(t, err)
-	require.Equal(t, int64(3), count)
+	require.Equal(t, int64(numQuestions), count)
 
 	nonExistentQuestion := "non_existent_question"
 	nonExistentCount, err := testQueries.GetCategoryQuestionsCount(context.Background(), nonExistentQuestion)
 	require.NoError(t, err)
 	require.Equal(t, int64(0), nonExistentCount)
-
-	for _, table := range tablesUsed {
-		err = testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
 
 func TestGetQuestionsCount(t *testing.T) {
-	tablesUsed := [2]string{"questions", "categories"}
+	defer testQueries.CleanTables(context.Background(), []string{"questions", "categories"})
 
-	for i := 0; i < 5; i++ {
+	const numQuestions = 10
+
+	for i := 0; i < numQuestions; i++ {
 		createRandomQuestion(t)
 	}
 
 	count, err := testQueries.GetQuestionsCount(context.Background())
 	require.NoError(t, err)
-	require.Equal(t, int64(5), count)
-
-	for _, table := range tablesUsed {
-		err = testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
+	require.Equal(t, int64(numQuestions), count)
 }
