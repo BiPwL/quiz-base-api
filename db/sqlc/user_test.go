@@ -56,6 +56,19 @@ func innerTestListUserAnsweredQuestions(t *testing.T, numQuestions int, userID i
 	}
 }
 
+func innerTestGetUserAnsweredQuestionsCount(t *testing.T, numQuestions int, userID int64, categoryKey string) {
+	defer testQueries.CleanTables(context.Background(), []string{"categories", "questions", "answered_questions"})
+
+	arg := GetUserAnsweredQuestionsCountParams{
+		UserID:   userID,
+		Category: categoryKey,
+	}
+
+	count, err := testQueries.GetUserAnsweredQuestionsCount(context.Background(), arg)
+	require.NoError(t, err)
+	require.Equal(t, int64(numQuestions), count)
+}
+
 func TestCreateUser(t *testing.T) {
 	defer testQueries.CleanTables(context.Background(), []string{"users"})
 
