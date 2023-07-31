@@ -176,7 +176,9 @@ func TestGetQuestionAnswersCount(t *testing.T) {
 func TestGetQuestionsCount(t *testing.T) {
 	defer testQueries.CleanTables(context.Background(), []string{"questions", "categories"})
 
-	for i := 0; i < 5; i++ {
+	const numQuestions = 10
+
+	for i := 0; i < numQuestions; i++ {
 		createRandomQuestion(t)
 	}
 
