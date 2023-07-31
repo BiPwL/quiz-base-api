@@ -174,3 +174,19 @@ func TestListUserAnsweredQuestions(t *testing.T) {
 	expectedQuestions = createAnsweredQuestionsWithRandomCategory(t, numQuestions, user.ID)
 	innerTestListUserAnsweredQuestions(t, numQuestions, user.ID, "", expectedQuestions)
 }
+
+func TestGetUserAnsweredQuestionsCount(t *testing.T) {
+	defer testQueries.CleanTables(context.Background(), []string{"users", "categories"})
+
+	const numQuestions = 5
+	user := createRandomUser(t)
+	category := createRandomCategory(t)
+
+	// test with category in request
+	createAnsweredQuestionsWithCategory(t, numQuestions, user.ID, category.Key)
+	innerTestGetUserAnsweredQuestionsCount(t, numQuestions, user.ID, category.Key)
+
+	// test "without" category in request
+	createAnsweredQuestionsWithRandomCategory(t, numQuestions, user.ID)
+	innerTestGetUserAnsweredQuestionsCount(t, numQuestions, user.ID, "")
+}
