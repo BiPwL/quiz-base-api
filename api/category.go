@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -48,7 +49,7 @@ func (server *Server) getCategory(ctx *gin.Context) {
 
 	category, err := server.store.GetCategory(ctx, req.Key)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
@@ -99,7 +100,7 @@ func (server *Server) deleteCategory(ctx *gin.Context) {
 
 	_, err := server.store.GetCategory(ctx, req.Key)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
@@ -184,7 +185,7 @@ func (server *Server) getCategoryQuestionsCount(ctx *gin.Context) {
 
 	_, err := server.store.GetCategory(ctx, req.Key)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
