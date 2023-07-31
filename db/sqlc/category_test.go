@@ -104,11 +104,12 @@ func TestListCategories(t *testing.T) {
 func TestListCategoryQuestions(t *testing.T) {
 	defer testQueries.CleanTables(context.Background(), []string{"categories", "questions"})
 
+	const numQuestions = 10
 	category := createRandomCategory(t)
-	expectedQuestions := [2]Question{}
+	expectedQuestions := [numQuestions]Question{}
 	var err error
 
-	for i := 0; i < 2; i++ {
+	for i := 0; i < numQuestions; i++ {
 		question := CreateQuestionParams{
 			Text:     util.RandomStr(8),
 			Hint:     util.RandomStr(6),
@@ -120,13 +121,13 @@ func TestListCategoryQuestions(t *testing.T) {
 
 	arg := ListCategoryQuestionsParams{
 		Category: category.Key,
-		Limit:    2,
+		Limit:    numQuestions,
 		Offset:   0,
 	}
 
 	questions, err := testQueries.ListCategoryQuestions(context.Background(), arg)
 	require.NoError(t, err)
-	require.Len(t, questions, 2)
+	require.Len(t, questions, numQuestions)
 
 	for i, question := range questions {
 		require.NotEmpty(t, question)
