@@ -64,10 +64,14 @@ func createAnsweredQuestionsWithRandomCategory(t *testing.T, num int, userID int
 }
 
 func TestCreateAnsweredQuestion(t *testing.T) {
+	defer testQueries.CleanTables(context.Background(), []string{"answered_questions", "users", "categories", "questions"})
+
 	createRandomAnsweredQuestion(t)
 }
 
 func TestGetAnsweredQuestion(t *testing.T) {
+	defer testQueries.CleanTables(context.Background(), []string{"answered_questions", "users", "categories", "questions"})
+
 	answeredQuestion1 := createRandomAnsweredQuestion(t)
 	answeredQuestion2, err := testQueries.GetAnsweredQuestion(context.Background(), answeredQuestion1.ID)
 	require.NoError(t, err)
@@ -80,6 +84,8 @@ func TestGetAnsweredQuestion(t *testing.T) {
 }
 
 func TestDeleteAnsweredQuestion(t *testing.T) {
+	defer testQueries.CleanTables(context.Background(), []string{"answered_questions", "users", "categories", "questions"})
+
 	answeredQuestion1 := createRandomAnsweredQuestion(t)
 	err := testQueries.DeleteAnsweredQuestion(context.Background(), answeredQuestion1.ID)
 	require.NoError(t, err)
@@ -91,6 +97,8 @@ func TestDeleteAnsweredQuestion(t *testing.T) {
 }
 
 func TestListAnsweredQuestions(t *testing.T) {
+	defer testQueries.CleanTables(context.Background(), []string{"answered_questions", "users", "categories", "questions"})
+
 	for i := 0; i < 10; i++ {
 		createRandomAnsweredQuestion(t)
 	}
