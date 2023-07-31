@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -54,7 +55,7 @@ func (server *Server) getAnsweredQuestion(ctx *gin.Context) {
 
 	answeredQuestion, err := server.store.GetAnsweredQuestion(ctx, req.ID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
@@ -103,13 +104,19 @@ func (server *Server) deleteAnsweredQuestion(ctx *gin.Context) {
 		return
 	}
 
-	err := server.store.DeleteAnsweredQuestion(ctx, req.ID)
+	_, err := server.store.GetAnsweredQuestion(ctx, req.ID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
 
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	err = server.store.DeleteAnsweredQuestion(ctx, req.ID)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
