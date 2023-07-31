@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/BiPwL/quiz-base-api/util"
 )
 
 func createRandomAnsweredQuestion(t *testing.T) AnsweredQuestion {
@@ -26,6 +28,39 @@ func createRandomAnsweredQuestion(t *testing.T) AnsweredQuestion {
 	require.NotZero(t, answeredQuestion.AnsweredAt)
 
 	return answeredQuestion
+}
+
+func createAnsweredQuestionsWithCategory(t *testing.T, num int, userID int64, categoryKey string) []Question {
+	var expectedQuestions []Question
+	for i := 0; i < num; i++ {
+		argQuestion := CreateQuestionParams{
+			Text: util.RandomStr(10),
+			Hint: util.RandomStr(8),
+		}
+		if categoryKey != "" {
+			argQuestion.Category = categoryKey
+		} else {
+			argQuestion.Category = createRandomCategory(t).Key
+		}
+
+		question, err := testQueries.CreateQuestion(context.Background(), argQuestion)
+		require.NoError(t, err)
+
+		argAnsweredQuestion := CreateAnsweredQuestionParams{
+			UserID:     userID,
+			QuestionID: question.ID,
+		}
+		_, err = testQueries.CreateAnsweredQuestion(context.Background(), argAnsweredQuestion)
+		require.NoError(t, err)
+
+		expectedQuestions = append(expectedQuestions, question)
+	}
+
+	return expectedQuestions
+}
+
+func createAnsweredQuestionsWithRandomCategory(t *testing.T, num int, userID int64) []Question {
+	return createAnsweredQuestionsWithCategory(t, num, userID, "")
 }
 
 func TestCreateAnsweredQuestion(t *testing.T) {
