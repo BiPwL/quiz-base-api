@@ -99,12 +99,14 @@ func TestDeleteAnsweredQuestion(t *testing.T) {
 func TestListAnsweredQuestions(t *testing.T) {
 	defer testQueries.CleanTables(context.Background(), []string{"answered_questions", "users", "categories", "questions"})
 
-	for i := 0; i < 10; i++ {
+	const numQuestions = 10
+
+	for i := 0; i < numQuestions; i++ {
 		createRandomAnsweredQuestion(t)
 	}
 	arg := ListAnsweredQuestionsParams{
-		Limit:  5,
-		Offset: 5,
+		Limit:  numQuestions,
+		Offset: 0,
 	}
 
 	answeredQuestions, err := testQueries.ListAnsweredQuestions(context.Background(), arg)
