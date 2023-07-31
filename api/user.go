@@ -11,8 +11,8 @@ import (
 )
 
 type createUserRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
+	Email          string `json:"email" binding:"required,email"`
+	HashedPassword string `json:"hashed_password" binding:"required"`
 }
 
 func (server *Server) createUser(ctx *gin.Context) {
@@ -23,8 +23,8 @@ func (server *Server) createUser(ctx *gin.Context) {
 	}
 
 	arg := db.CreateUserParams{
-		Email:    req.Email,
-		Password: req.Password,
+		Email:          req.Email,
+		HashedPassword: req.HashedPassword,
 	}
 
 	user, err := server.store.CreateUser(ctx, arg)
@@ -119,8 +119,8 @@ func (server *Server) deleteUser(ctx *gin.Context) {
 }
 
 type updateUserRequest struct {
-	ID       int64  `json:"id" binding:"required,min=1"`
-	Password string `json:"password" binding:"required"`
+	ID             int64  `json:"id" binding:"required,min=1"`
+	HashedPassword string `json:"hashed_password" binding:"required"`
 }
 
 func (server *Server) updateUser(ctx *gin.Context) {
@@ -131,8 +131,8 @@ func (server *Server) updateUser(ctx *gin.Context) {
 	}
 
 	arg := db.UpdateUserParams{
-		ID:       req.ID,
-		Password: req.Password,
+		ID:             req.ID,
+		HashedPassword: req.HashedPassword,
 	}
 
 	user, err := server.store.UpdateUser(ctx, arg)
