@@ -168,11 +168,13 @@ func TestGetCategoryQuestionsCount(t *testing.T) {
 func TestGetCategoriesCount(t *testing.T) {
 	defer testQueries.CleanTables(context.Background(), []string{"categories"})
 
-	for i := 0; i < 5; i++ {
+	const numQuestions = 10
+
+	for i := 0; i < numQuestions; i++ {
 		createRandomCategory(t)
 	}
 
 	count, err := testQueries.GetCategoriesCount(context.Background())
 	require.NoError(t, err)
-	require.Equal(t, int64(5), count)
+	require.Equal(t, int64(numQuestions), count)
 }
