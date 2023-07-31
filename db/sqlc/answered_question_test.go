@@ -111,7 +111,7 @@ func TestListAnsweredQuestions(t *testing.T) {
 
 	answeredQuestions, err := testQueries.ListAnsweredQuestions(context.Background(), arg)
 	require.NoError(t, err)
-	require.Len(t, answeredQuestions, 5)
+	require.Len(t, answeredQuestions, numQuestions)
 
 	for _, answeredQuestion := range answeredQuestions {
 		require.NotEmpty(t, answeredQuestion)
