@@ -34,10 +34,10 @@ CREATE TABLE "answered_questions"
 
 CREATE TABLE "users"
 (
-    "id"         BIGSERIAL PRIMARY KEY NOT NULL,
-    "email"      varchar UNIQUE        NOT NULL,
-    "password"   varchar               NOT NULL,
-    "created_at" TIMESTAMP             NOT NULL DEFAULT (now())
+    "id"              BIGSERIAL PRIMARY KEY NOT NULL,
+    "email"           varchar UNIQUE        NOT NULL,
+    "hashed_password" varchar               NOT NULL,
+    "created_at"      TIMESTAMP             NOT NULL DEFAULT (now())
 );
 
 CREATE INDEX ON "answers" ("question_id");
