@@ -188,3 +188,34 @@ func (server *Server) listUserAnsweredQuestions(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, answeredQuestions)
 }
+
+type getUserAnsweredQuestionsCountRequest struct {
+	UserID   int64  `form:"user_id" binding:"required,min=1"`
+	Category string `form:"category" binding:"omitempty"`
+}
+
+func (server *Server) getUserAnsweredQuestionsCount(ctx *gin.Context) {
+	var req getUserAnsweredQuestionsCountRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.GetUserAnsweredQuestionsCountParams{
+		UserID:   req.UserID,
+		Category: req.Category,
+	}
+
+	count, err := server.store.GetUserAnsweredQuestionsCount(ctx, arg)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, count)
+}
