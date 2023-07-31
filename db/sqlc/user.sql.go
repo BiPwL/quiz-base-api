@@ -11,23 +11,23 @@ import (
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO "users" ("email",
-                     "password")
+                     "hashed_password")
 VALUES ($1, $2)
-RETURNING id, email, password, created_at
+RETURNING id, email, hashed_password, created_at
 `
 
 type CreateUserParams struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email          string `json:"email"`
+	HashedPassword string `json:"hashed_password"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.Email, arg.Password)
+	row := q.db.QueryRowContext(ctx, createUser, arg.Email, arg.HashedPassword)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
-		&i.Password,
+		&i.HashedPassword,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -45,7 +45,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, email, password, created_at
+SELECT id, email, hashed_password, created_at
 FROM "users"
 WHERE "id" = $1
 LIMIT 1
@@ -57,7 +57,7 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
-		&i.Password,
+		&i.HashedPassword,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -146,7 +146,7 @@ func (q *Queries) ListUserAnsweredQuestions(ctx context.Context, arg ListUserAns
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, email, password, created_at
+SELECT id, email, hashed_password, created_at
 FROM "users"
 ORDER BY "id"
 LIMIT $1 OFFSET $2
@@ -169,7 +169,7 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 		if err := rows.Scan(
 			&i.ID,
 			&i.Email,
-			&i.Password,
+			&i.HashedPassword,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -187,23 +187,23 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 
 const updateUser = `-- name: UpdateUser :one
 UPDATE "users"
-SET "password" = $2
+SET "hashed_password" = $2
 WHERE "id" = $1
-RETURNING id, email, password, created_at
+RETURNING id, email, hashed_password, created_at
 `
 
 type UpdateUserParams struct {
-	ID       int64  `json:"id"`
-	Password string `json:"password"`
+	ID             int64  `json:"id"`
+	HashedPassword string `json:"hashed_password"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, updateUser, arg.ID, arg.Password)
+	row := q.db.QueryRowContext(ctx, updateUser, arg.ID, arg.HashedPassword)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
-		&i.Password,
+		&i.HashedPassword,
 		&i.CreatedAt,
 	)
 	return i, err
