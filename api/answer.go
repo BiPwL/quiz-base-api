@@ -99,13 +99,19 @@ func (server *Server) deleteAnswer(ctx *gin.Context) {
 		return
 	}
 
-	err := server.store.DeleteAnswer(ctx, req.ID)
+	_, err := server.store.GetAnswer(ctx, req.ID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
 
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	err = server.store.DeleteAnswer(ctx, req.ID)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
