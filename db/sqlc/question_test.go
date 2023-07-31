@@ -90,17 +90,19 @@ func TestDeleteQuestion(t *testing.T) {
 func TestListQuestion(t *testing.T) {
 	defer testQueries.CleanTables(context.Background(), []string{"questions", "categories"})
 
-	for i := 0; i < 10; i++ {
+	const numQuestions = 10
+
+	for i := 0; i < numQuestions; i++ {
 		createRandomQuestion(t)
 	}
 	arg := ListQuestionsParams{
-		Limit:  5,
-		Offset: 5,
+		Limit:  numQuestions,
+		Offset: 0,
 	}
 
 	questions, err := testQueries.ListQuestions(context.Background(), arg)
 	require.NoError(t, err)
-	require.Len(t, questions, 5)
+	require.Len(t, questions, numQuestions)
 
 	for _, question := range questions {
 		require.NotEmpty(t, question)
@@ -178,5 +180,5 @@ func TestGetQuestionsCount(t *testing.T) {
 
 	count, err := testQueries.GetQuestionsCount(context.Background())
 	require.NoError(t, err)
-	require.Equal(t, int64(5), count)
+	require.Equal(t, int64(numQuestions), count)
 }
