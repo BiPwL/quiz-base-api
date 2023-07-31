@@ -26,3 +26,22 @@ RETURNING *;
 DELETE
 FROM "users"
 WHERE "id" = $1;
+
+-- name: GetUsersCount :one
+SELECT COUNT(*)
+FROM "users";
+
+-- name: ListUserAnsweredQuestions :many
+SELECT q.id, q.text, q.hint, q.category, q.created_at
+FROM "answered_questions" AS aq
+         JOIN "questions" AS q ON aq.question_id = q.id
+WHERE aq.user_id = sqlc.arg(user_id)
+  AND (sqlc.arg(category)::TEXT = '' OR q.category = sqlc.arg(category)::TEXT)
+LIMIT $1 OFFSET $2;
+
+-- name: GetUserAnsweredQuestionsCount :one
+SELECT COUNT(*)
+FROM "answered_questions" AS aq
+         JOIN "questions" AS q ON aq.question_id = q.id
+WHERE aq.user_id = sqlc.arg(user_id)
+  AND (sqlc.arg(category)::TEXT = '' OR q.category = sqlc.arg(category)::TEXT);

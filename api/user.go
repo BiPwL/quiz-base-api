@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -48,7 +49,7 @@ func (server *Server) getUser(ctx *gin.Context) {
 
 	user, err := server.store.GetUser(ctx, req.ID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
@@ -97,9 +98,9 @@ func (server *Server) deleteUser(ctx *gin.Context) {
 		return
 	}
 
-	err := server.store.DeleteUser(ctx, req.ID)
+	_, err := server.store.GetUser(ctx, req.ID)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
@@ -108,16 +109,22 @@ func (server *Server) deleteUser(ctx *gin.Context) {
 		return
 	}
 
+	err = server.store.DeleteUser(ctx, req.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
 	ctx.Status(http.StatusOK)
 }
 
-type updateUserParams struct {
+type updateUserRequest struct {
 	ID       int64  `json:"id" binding:"required,min=1"`
 	Password string `json:"password" binding:"required"`
 }
 
 func (server *Server) updateUser(ctx *gin.Context) {
-	var req updateUserParams
+	var req updateUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -135,4 +142,80 @@ func (server *Server) updateUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, user)
+}
+
+func (server *Server) getUsersCount(ctx *gin.Context) {
+	count, err := server.store.GetUsersCount(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, count)
+}
+
+type listUserAnsweredQuestionsRequest struct {
+	PageID   int32  `form:"page_id" binding:"required,min=1"`
+	PageSize int32  `form:"page_size" binding:"required,min=5,max=10"`
+	UserID   int64  `form:"user_id" binding:"required,min=1"`
+	Category string `form:"category" binding:"omitempty"`
+}
+
+func (server *Server) listUserAnsweredQuestions(ctx *gin.Context) {
+	var req listUserAnsweredQuestionsRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.ListUserAnsweredQuestionsParams{
+		Limit:    req.PageSize,
+		Offset:   (req.PageID - 1) * req.PageSize,
+		UserID:   req.UserID,
+		Category: req.Category,
+	}
+
+	answeredQuestions, err := server.store.ListUserAnsweredQuestions(ctx, arg)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, answeredQuestions)
+}
+
+type getUserAnsweredQuestionsCountRequest struct {
+	UserID   int64  `form:"user_id" binding:"required,min=1"`
+	Category string `form:"category" binding:"omitempty"`
+}
+
+func (server *Server) getUserAnsweredQuestionsCount(ctx *gin.Context) {
+	var req getUserAnsweredQuestionsCountRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.GetUserAnsweredQuestionsCountParams{
+		UserID:   req.UserID,
+		Category: req.Category,
+	}
+
+	count, err := server.store.GetUserAnsweredQuestionsCount(ctx, arg)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, count)
 }
