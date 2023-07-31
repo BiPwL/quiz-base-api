@@ -41,8 +41,8 @@ type Question struct {
 }
 
 type User struct {
-	ID        int64     `json:"id"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
-	CreatedAt time.Time `json:"created_at"`
+	ID             int64     `json:"id"`
+	Email          string    `json:"email"`
+	HashedPassword string    `json:"hashed_password"`
+	CreatedAt      time.Time `json:"created_at"`
 }
