@@ -134,13 +134,15 @@ func TestListAnswers(t *testing.T) {
 func TestGetAnswersCount(t *testing.T) {
 	tablesUsed := [3]string{"answers", "questions", "categories"}
 
-	for i := 0; i < 5; i++ {
+	const numQuestions = 10
+
+	for i := 0; i < numQuestions; i++ {
 		createRandomAnswer(t)
 	}
 
 	count, err := testQueries.GetAnswersCount(context.Background())
 	require.NoError(t, err)
-	require.Equal(t, int64(5), count)
+	require.Equal(t, int64(numQuestions), count)
 
 	for _, table := range tablesUsed {
 		err = testQueries.CleanTable(context.Background(), table)
