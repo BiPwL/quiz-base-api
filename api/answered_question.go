@@ -31,7 +31,8 @@ func (server *Server) createAnsweredQuestion(ctx *gin.Context) {
 	answeredQuestion, err := server.store.CreateAnsweredQuestion(ctx, arg)
 
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok && pqErr.Constraint == "idx_unique_user_question" {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) && pqErr.Constraint == "idx_unique_user_question" {
 			ctx.JSON(http.StatusBadRequest, errorResponse(err))
 			return
 		}
