@@ -82,12 +82,14 @@ func TestDeleteCategory(t *testing.T) {
 func TestListCategories(t *testing.T) {
 	defer testQueries.CleanTables(context.Background(), []string{"categories"})
 
-	for i := 0; i < 10; i++ {
+	const numQuestions = 10
+
+	for i := 0; i < numQuestions; i++ {
 		createRandomCategory(t)
 	}
 	arg := ListCategoriesParams{
-		Limit:  5,
-		Offset: 5,
+		Limit:  numQuestions,
+		Offset: 0,
 	}
 
 	categories, err := testQueries.ListCategories(context.Background(), arg)
