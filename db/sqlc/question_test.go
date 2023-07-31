@@ -150,9 +150,10 @@ func TestListQuestionAnswers(t *testing.T) {
 func TestGetQuestionAnswersCount(t *testing.T) {
 	defer testQueries.CleanTables(context.Background(), []string{"answers", "questions", "categories"})
 
+	const numQuestions = 10
 	question := createRandomQuestion(t)
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < numQuestions; i++ {
 		answer := CreateAnswerParams{
 			QuestionID: question.ID,
 			Text:       util.RandomStr(8),
@@ -164,7 +165,7 @@ func TestGetQuestionAnswersCount(t *testing.T) {
 
 	count, err := testQueries.GetQuestionAnswersCount(context.Background(), question.ID)
 	require.NoError(t, err)
-	require.Equal(t, int64(3), count)
+	require.Equal(t, int64(numQuestions), count)
 
 	nonExistentQuestion := "non_existent_question"
 	nonExistentCount, err := testQueries.GetCategoryQuestionsCount(context.Background(), nonExistentQuestion)
