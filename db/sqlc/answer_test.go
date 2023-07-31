@@ -31,18 +31,13 @@ func createRandomAnswer(t *testing.T) Answer {
 }
 
 func TestCreateAnswer(t *testing.T) {
-	tablesUsed := [3]string{"answers", "questions", "categories"}
+	defer testQueries.CleanTables(context.Background(), []string{"answers", "questions", "categories"})
 
 	createRandomAnswer(t)
-
-	for _, table := range tablesUsed {
-		err := testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
 
 func TestGetAnswer(t *testing.T) {
-	tablesUsed := [3]string{"answers", "questions", "categories"}
+	defer testQueries.CleanTables(context.Background(), []string{"answers", "questions", "categories"})
 
 	answer1 := createRandomAnswer(t)
 	answer2, err := testQueries.GetAnswer(context.Background(), answer1.ID)
@@ -53,15 +48,10 @@ func TestGetAnswer(t *testing.T) {
 	require.Equal(t, answer1.QuestionID, answer2.QuestionID)
 	require.Equal(t, answer1.Text, answer2.Text)
 	require.Equal(t, answer1.IsCorrect, answer2.IsCorrect)
-
-	for _, table := range tablesUsed {
-		err = testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
 
 func TestUpdateAnswer(t *testing.T) {
-	tablesUsed := [3]string{"answers", "questions", "categories"}
+	defer testQueries.CleanTables(context.Background(), []string{"answers", "questions", "categories"})
 
 	answer1 := createRandomAnswer(t)
 
@@ -79,15 +69,10 @@ func TestUpdateAnswer(t *testing.T) {
 	require.Equal(t, answer1.QuestionID, answer2.QuestionID)
 	require.Equal(t, arg.Text, answer2.Text)
 	require.Equal(t, arg.IsCorrect, answer2.IsCorrect)
-
-	for _, table := range tablesUsed {
-		err = testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
 
 func TestDeleteAnswer(t *testing.T) {
-	tablesUsed := [3]string{"answers", "questions", "categories"}
+	defer testQueries.CleanTables(context.Background(), []string{"answers", "questions", "categories"})
 
 	answer1 := createRandomAnswer(t)
 	err := testQueries.DeleteAnswer(context.Background(), answer1.ID)
@@ -97,15 +82,10 @@ func TestDeleteAnswer(t *testing.T) {
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, answer2)
-
-	for _, table := range tablesUsed {
-		err = testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
 
 func TestListAnswers(t *testing.T) {
-	tablesUsed := [3]string{"answers", "questions", "categories"}
+	defer testQueries.CleanTables(context.Background(), []string{"answers", "questions", "categories"})
 
 	const numQuestions = 10
 
@@ -124,15 +104,10 @@ func TestListAnswers(t *testing.T) {
 	for _, answer := range answers {
 		require.NotEmpty(t, answer)
 	}
-
-	for _, table := range tablesUsed {
-		err = testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
 
 func TestGetAnswersCount(t *testing.T) {
-	tablesUsed := [3]string{"answers", "questions", "categories"}
+	defer testQueries.CleanTables(context.Background(), []string{"answers", "questions", "categories"})
 
 	const numQuestions = 10
 
@@ -143,9 +118,4 @@ func TestGetAnswersCount(t *testing.T) {
 	count, err := testQueries.GetAnswersCount(context.Background())
 	require.NoError(t, err)
 	require.Equal(t, int64(numQuestions), count)
-
-	for _, table := range tablesUsed {
-		err = testQueries.CleanTable(context.Background(), table)
-		require.NoError(t, err)
-	}
 }
