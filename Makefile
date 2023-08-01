@@ -5,7 +5,7 @@ build:
 
 .PHONY: test
 test:
-	go test -v -cover -race -timeout 30s ./...;
+	go test -v -cover -race -timeout 60s ./...;
 .DEFAULT_GOAL := build
 
 .PHONY: server

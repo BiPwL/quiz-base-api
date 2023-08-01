@@ -99,19 +99,19 @@ func TestDeleteAnsweredQuestion(t *testing.T) {
 func TestListAnsweredQuestions(t *testing.T) {
 	defer testQueries.CleanTables(context.Background(), []string{"answered_questions", "users", "categories", "questions"})
 
-	const numQuestions = 10
+	const numAnsweredQuestions = 5
 
-	for i := 0; i < numQuestions; i++ {
+	for i := 0; i < numAnsweredQuestions; i++ {
 		createRandomAnsweredQuestion(t)
 	}
 	arg := ListAnsweredQuestionsParams{
-		Limit:  numQuestions,
+		Limit:  numAnsweredQuestions,
 		Offset: 0,
 	}
 
 	answeredQuestions, err := testQueries.ListAnsweredQuestions(context.Background(), arg)
 	require.NoError(t, err)
-	require.Len(t, answeredQuestions, numQuestions)
+	require.Len(t, answeredQuestions, numAnsweredQuestions)
 
 	for _, answeredQuestion := range answeredQuestions {
 		require.NotEmpty(t, answeredQuestion)

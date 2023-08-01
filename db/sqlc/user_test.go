@@ -12,9 +12,12 @@ import (
 )
 
 func createRandomUser(t *testing.T) User {
+	hashedPassword, err := util.HashPassword(util.RandomPasswordStr(8))
+	require.NoError(t, err)
+
 	arg := CreateUserParams{
 		Email:          util.RandomEmail(),
-		HashedPassword: util.RandomPasswordStr(8),
+		HashedPassword: hashedPassword,
 	}
 
 	user, err := testQueries.CreateUser(context.Background(), arg)
@@ -125,19 +128,19 @@ func TestDeleteUser(t *testing.T) {
 func TestListUsers(t *testing.T) {
 	defer testQueries.CleanTables(context.Background(), []string{"users"})
 
-	const numQuestions = 10
+	const numUsers = 5
 
-	for i := 0; i < numQuestions; i++ {
+	for i := 0; i < numUsers; i++ {
 		createRandomUser(t)
 	}
 	arg := ListUsersParams{
-		Limit:  numQuestions,
+		Limit:  numUsers,
 		Offset: 0,
 	}
 
 	users, err := testQueries.ListUsers(context.Background(), arg)
 	require.NoError(t, err)
-	require.Len(t, users, numQuestions)
+	require.Len(t, users, numUsers)
 
 	for _, user := range users {
 		require.NotEmpty(t, user)
@@ -147,15 +150,15 @@ func TestListUsers(t *testing.T) {
 func TestGetUsersCount(t *testing.T) {
 	defer testQueries.CleanTables(context.Background(), []string{"users"})
 
-	const numQuestions = 10
+	const numUsers = 5
 
-	for i := 0; i < numQuestions; i++ {
+	for i := 0; i < numUsers; i++ {
 		createRandomUser(t)
 	}
 
 	count, err := testQueries.GetUsersCount(context.Background())
 	require.NoError(t, err)
-	require.Equal(t, int64(numQuestions), count)
+	require.Equal(t, int64(numUsers), count)
 }
 
 func TestListUserAnsweredQuestions(t *testing.T) {
