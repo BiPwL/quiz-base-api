@@ -45,8 +45,8 @@ func RandomEmail() string {
 	return randomStrWithAlphabet(12, alphabetForEmailName) + "@" + randomStrWithAlphabet(4, alphabet) + "." + randomStrWithAlphabet(3, alphabet)
 }
 
-// RandomPassword generates a random password
-func RandomPassword(n int) string {
+// RandomPasswordStr generates a random password
+func RandomPasswordStr(n int) string {
 	return randomStrWithAlphabet(n, alphabetWithNumbers)
 }
 
