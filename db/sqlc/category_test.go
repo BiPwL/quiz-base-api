@@ -82,19 +82,19 @@ func TestDeleteCategory(t *testing.T) {
 func TestListCategories(t *testing.T) {
 	defer testQueries.CleanTables(context.Background(), []string{"categories"})
 
-	const numQuestions = 10
+	const numCategories = 10
 
-	for i := 0; i < numQuestions; i++ {
+	for i := 0; i < numCategories; i++ {
 		createRandomCategory(t)
 	}
 	arg := ListCategoriesParams{
-		Limit:  numQuestions,
+		Limit:  numCategories,
 		Offset: 0,
 	}
 
 	categories, err := testQueries.ListCategories(context.Background(), arg)
 	require.NoError(t, err)
-	require.Len(t, categories, numQuestions)
+	require.Len(t, categories, numCategories)
 
 	for _, category := range categories {
 		require.NotEmpty(t, category)
@@ -168,13 +168,13 @@ func TestGetCategoryQuestionsCount(t *testing.T) {
 func TestGetCategoriesCount(t *testing.T) {
 	defer testQueries.CleanTables(context.Background(), []string{"categories"})
 
-	const numQuestions = 10
+	const numCategories = 10
 
-	for i := 0; i < numQuestions; i++ {
+	for i := 0; i < numCategories; i++ {
 		createRandomCategory(t)
 	}
 
 	count, err := testQueries.GetCategoriesCount(context.Background())
 	require.NoError(t, err)
-	require.Equal(t, int64(numQuestions), count)
+	require.Equal(t, int64(numCategories), count)
 }
