@@ -14,7 +14,7 @@ import (
 func createRandomUser(t *testing.T) User {
 	arg := CreateUserParams{
 		Email:          util.RandomEmail(),
-		HashedPassword: util.RandomPassword(8),
+		HashedPassword: util.RandomPasswordStr(8),
 	}
 
 	user, err := testQueries.CreateUser(context.Background(), arg)
@@ -96,7 +96,7 @@ func TestUpdateUser(t *testing.T) {
 
 	arg := UpdateUserParams{
 		ID:             user1.ID,
-		HashedPassword: util.RandomPassword(8),
+		HashedPassword: util.RandomPasswordStr(8),
 	}
 
 	user2, err := testQueries.UpdateUser(context.Background(), arg)
