@@ -72,6 +72,19 @@ func TestGetUserAPI(t *testing.T) {
 				require.Equal(t, http.StatusNotFound, recorder.Code)
 			},
 		},
+		{
+			name:   "InternalError",
+			userID: user.ID,
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUser(gomock.Any(), gomock.Eq(user.ID)).
+					Times(1).
+					Return(db.User{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
 	}
 
 	for i := range testCases {
