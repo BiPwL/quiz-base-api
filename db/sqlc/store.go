@@ -8,6 +8,13 @@ import (
 
 // Store provides all functions to execute db queries and transactions
 type Store struct {
+type Store interface {
+	Querier
+	TableExists(ctx context.Context, tableName string) (bool, error)
+	CleanTable(ctx context.Context, tableName string) error
+	CleanTables(ctx context.Context, tablesNames []string) []error
+}
+
 	*Queries
 	db *sql.DB
 }
