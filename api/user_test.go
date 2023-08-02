@@ -8,8 +8,10 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 
@@ -18,12 +20,17 @@ import (
 	"github.com/BiPwL/quiz-base-api/util"
 )
 
-func randomUser() db.User {
-	return db.User{
+func randomUser(t *testing.T) (user db.User, password string) {
+	password = util.RandomPasswordStr(8)
+	hashedPassword, err := util.HashPassword(password)
+	require.NoError(t, err)
+
+	user = db.User{
 		ID:             util.RandomInt(1, 1000),
 		Email:          util.RandomEmail(),
-		HashedPassword: util.RandomPasswordStr(10),
+		HashedPassword: hashedPassword,
 	}
+	return
 }
 
 func requireBodyMatchUser(t *testing.T, body *bytes.Buffer, user db.User) {
