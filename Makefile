@@ -103,6 +103,10 @@ migrate_down:
 sqlc:
 	sqlc generate
 
+.PHONY: mock
+mock:
+	mockgen -package mockdb -destination db/mock/store.go github.com/BiPwL/quiz-base-api/db/sqlc Store
+
 #********************************************
 
 #commands for quick project deployment

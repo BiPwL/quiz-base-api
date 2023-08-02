@@ -7,21 +7,29 @@ import (
 )
 
 // Store provides all functions to execute db queries and transactions
-type Store struct {
+type Store interface {
+	Querier
+	TableExists(ctx context.Context, tableName string) (bool, error)
+	CleanTable(ctx context.Context, tableName string) error
+	CleanTables(ctx context.Context, tablesNames []string) []error
+}
+
+// SQLStore provides all functions to execute SQL queries and transactions
+type SQLStore struct {
 	*Queries
 	db *sql.DB
 }
 
 // NewStore create a new Store
-func NewStore(db *sql.DB) *Store {
-	return &Store{
+func NewStore(db *sql.DB) Store {
+	return &SQLStore{
 		db:      db,
 		Queries: New(db),
 	}
 }
 
 // execTx executes a functions within a database transactions
-func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
+func (store *SQLStore) execTx(ctx context.Context, fn func(*Queries) error) error {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
