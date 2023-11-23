@@ -59,6 +59,8 @@ func NewServer(store db.Store) *Server {
 	// dev operations handlers
 	router.DELETE("clean/:name", server.cleanTable)
 
+	router.Use(corsMiddleware())
+
 	server.router = router
 	return server
 }
@@ -70,4 +72,20 @@ func (server *Server) Start(address string) error {
 
 func errorResponse(err error) gin.H {
 	return gin.H{"error": err.Error()}
+}
+
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		// Если это preflight запрос (OPTIONS), то не обрабатываем его далее
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
 }
