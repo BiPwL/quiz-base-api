@@ -60,8 +60,6 @@ func NewServer(store db.Store) *Server {
 	// dev operations handlers
 	router.DELETE("clean/:name", server.cleanTable)
 
-	router.Use(corsMiddleware())
-
 	server.router = router
 	return server
 }
